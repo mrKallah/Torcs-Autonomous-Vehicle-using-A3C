@@ -646,4 +646,3 @@ int ReEventShutdown(void)
 	return RM_SYNC | ret;
 }
 
-

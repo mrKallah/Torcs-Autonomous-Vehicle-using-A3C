@@ -875,4 +875,3 @@ ReTimeMod (void *vcmd)
 	ReRaceMsgSet(buf, 5);
 }
 
-
