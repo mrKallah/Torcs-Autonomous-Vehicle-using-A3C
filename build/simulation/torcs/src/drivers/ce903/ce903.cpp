@@ -36,6 +36,7 @@
 #include <robottools.h>
 #include <robot.h>
 
+
 using namespace std;
 
 static tTrack	*curTrack;
@@ -121,22 +122,22 @@ drive(int index, tCarElt* car, tSituation *s)
     float accel, steer;
     int restart;
     if (instructions_file.is_open()) {
-        getline(instructions_file, in, ',');
         try{
+			getline(instructions_file, in, ',');
             accel = stof(in); 
-            getline(instructions_file, in, ','); 
         } catch(const exception& e) {
          cout << "in = " << in << endl;
         }
         try{
-        steer = stof(in); 
-        getline(instructions_file, in, ',');
+			getline(instructions_file, in, ',');
+			steer = stof(in); 
         } catch (const exception& e) {
          cout << "in = " << in << endl;
         }
         
         try{
-            restart = stoi(in);
+			getline(instructions_file, in, ','); 
+			restart = stoi(in);
         } catch (const exception& e) {
             cout << "in = " << in << endl;
         }
@@ -162,7 +163,7 @@ drive(int index, tCarElt* car, tSituation *s)
     //car->_clutchCmd 
 	car->_accelCmd = accel;
 	car->_steerCmd = steer;
-    car->_askRestart = (restart == 1);
+    car->_askRestart = (restart == 1);	
 	
 	if (car->_collision != 0){
 		has_col = true;
@@ -184,4 +185,5 @@ static void
 shutdown(int index)
 {
 }
+
 
