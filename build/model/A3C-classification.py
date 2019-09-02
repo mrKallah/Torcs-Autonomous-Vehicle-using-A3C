@@ -14,10 +14,10 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from model import feature_vec
 from server import step, reset
 
-UPDATE_GLOBAL_ITER = 10
-GAMMA = 0.9
-MAX_EP = 40
-# MAX_EP = 4000
+UPDATE_GLOBAL_ITER = 1
+GAMMA = 0.9 #0.9
+MAX_EP = 10
+learning_rate = 0.0001 # was 0.0001
 
 # game_name = 'MountainCar-v0'
 game_name = 'CartPole-v0'
@@ -64,7 +64,6 @@ class Net(nn.Module):
         logits, _ = self.forward(s)
 
         prob = F.softmax(logits).data
-        # prob = F.tanh(logits).data
         m = self.distribution(prob)
         out = m.sample().numpy()
         return out
@@ -105,7 +104,7 @@ class Worker(mp.Process):
             # s = self.env.reset()
             # feature_vec
             buffer_s, buffer_a, buffer_r = [], [], []
-            ep_r = 0.
+            ep_r = 0.0
             while True:
                 r = 0
                 # if self.name == 'w0':
@@ -154,7 +153,7 @@ if __name__ == "__main__":
     gnet = Net(N_S, N_A)
     # share the global parameters in multiprocessing
     gnet.share_memory()
-    opt = SharedAdam(gnet.parameters(), lr=0.0001)      # global optimizer
+    opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.),
                                          mp.Queue())
     worker_amount = mp.cpu_count()
@@ -175,6 +174,7 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
     plt.plot(res)
+    plt.axis('on')
     plt.ylabel('Moving average ep reward')
     plt.xlabel('Step')
     plt.show()

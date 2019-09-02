@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 import csv
 from pro import process
+from video_frame import update
 
 _connected = False
 
@@ -13,6 +14,7 @@ def connect(PORT):
 
     global _connected
     if not _connected:
+        update([[0]])
         print("Waiting for connection....")
 
     HOST = ""
@@ -120,6 +122,7 @@ def step(action):
         # print("collision = {} & reward = {}".format(collision, reward))
         img = format_img(img)
         drive_car(action, 0)
+        update(img)
     else:
         raise ValueError("No image was received")
 
@@ -144,6 +147,7 @@ def reset():
         img = format_img(img)
         # print("drive")
         drive_car(0, 0)
+        update(img)
         # print("return")
     else:
         raise ValueError("No image was received")

@@ -55,7 +55,7 @@ def push_and_pull(opt, lnet, gnet, done, s_, bs, ba, br, gamma):
 
 
 
-learning_rate = 0.1
+learning_rate = 0.01
 
 
 def record(global_ep, global_ep_r, ep_r, res_queue, name):
@@ -65,8 +65,8 @@ def record(global_ep, global_ep_r, ep_r, res_queue, name):
         if global_ep_r.value == 0.:
             global_ep_r.value = ep_r
         else:
-            # global_ep_r.value = global_ep_r.value * 1 - learning_rate + ep_r * learning_rate
-            global_ep_r.value = ep_r
+            global_ep_r.value = global_ep_r.value * (1 - learning_rate) + ep_r * learning_rate
+            # global_ep_r.value = ep_r
     res_queue.put(global_ep_r.value)
     print(
         name,
