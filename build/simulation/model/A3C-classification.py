@@ -107,6 +107,7 @@ class Worker(mp.Process):
             buffer_s, buffer_a, buffer_r = [], [], []
             ep_r = 0.
             while True:
+                r = 0
                 # if self.name == 'w0':
                     # self.env.render()
                     # feature_vec
@@ -114,14 +115,16 @@ class Worker(mp.Process):
                 # a = self.lnet.choose_action(v_wrap(s[None, :]))
                 s_, r, done = step(a)
                 s_ = feature_vec(s)
+
+
+                print("action = {}, reward = {}, episode reward = {}, restart = {}".format(a-1, r, ep_r, done))
+
                 # s_, r, done, _ = self.env.step(a)
                 # feature_vec
                 # print("a", a)
                 # print("s_", s_)
                 # print("r", r)
                 # print("done", done)
-                if done:
-                    r = -1
                 ep_r += r
                 buffer_a.append(a)
                 buffer_s.append(s)

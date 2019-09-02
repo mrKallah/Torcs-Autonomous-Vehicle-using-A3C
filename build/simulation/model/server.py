@@ -7,8 +7,14 @@ import sys
 import csv
 from pro import process
 
+_connected = False
 
 def connect(PORT):
+
+    global _connected
+    if not _connected:
+        print("Waiting for connection....")
+
     HOST = ""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -17,6 +23,7 @@ def connect(PORT):
     s.listen(1)
     # print("Waiting for connection....")
     conn, addr = s.accept()
+    _connected = True
     return s, conn, addr
 
 
@@ -79,9 +86,8 @@ def dump(filename="Untitled", data=None):
 def drive_car(action, reset):
     with open('drive_instructions.csv', mode='w') as file:
         writer = csv.writer(file)
-        action -= 1
-        print("speed = {}, turning = {}, reset = {}".format(speed, action, reset))
-        writer.writerow([speed, action, reset])  # [acceleration (0 - 1), turning (-1 - 1), restart (0 = no, 1 = yes)]
+        _action = action - 1
+        writer.writerow([speed, _action, reset])  # [acceleration (0 - 1), turning (-1 - 1), restart (0 = no, 1 = yes)]
 
 
 def main():
@@ -108,17 +114,14 @@ def step(action):
 
 
     if img is not None:
+        reward = 0
         reward = int(img[0]) - 1
         collision = int(img[1])
-        # print("col = {} && rew = {}".format(collision, reward))
+        # print("collision = {} & reward = {}".format(collision, reward))
         img = format_img(img)
-        # print("drive")
         drive_car(action, 0)
-        # print("return")
     else:
         raise ValueError("No image was received")
-
-
 
     return (img, reward, collision)
 
@@ -134,12 +137,13 @@ def reset():
 
 
     if img is not None:
+        reward = 0
         reward = int(img[0]) - 1
         collision = bool(img[1])
         # print("col = {} && rew = {}".format(collision, reward))
         img = format_img(img)
         # print("drive")
-        drive_car(0, 1)
+        drive_car(0, 0)
         # print("return")
     else:
         raise ValueError("No image was received")
