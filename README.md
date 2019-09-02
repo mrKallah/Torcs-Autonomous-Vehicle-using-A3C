@@ -5,7 +5,10 @@ AI controller for autonomous cars
 To set up and run the project use the files inside the 'build' folder. More instructions can be found there as well.
 
 ## Example:
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Lj77aspuhfE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+https://youtu.be/Lj77aspuhfE
+
+
 
 ## Credits
 original project: https://github.com/dmachlanski/ce903-tesla
