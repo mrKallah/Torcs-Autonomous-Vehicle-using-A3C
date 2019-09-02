@@ -7,7 +7,7 @@ To set up and run the project use the files inside the 'build' folder. More inst
 ## Example video:
 ### Click to watch video
 
-[![Torcs A3C Demonstration Video](https://images-ext-2.discordapp.net/external/ovYWAmDYwpcmhkaYIiQ19_dNAuCSvi0asCOGusdAb4g/https/i.ytimg.com/vi/Lj77aspuhfE/maxresdefault.jpg)](https://www.youtube.com/watch?v=Lj77aspuhfE&feature=youtu.be "Torcs A3C Demonstration Video")
+[![Torcs A3C Demonstration Video](https://images-ext-2.discordapp.net/external/e5VFeD2Dhnfqm6uhzSM2ZDg2GQfwZb_Xk-Fl2mV5B4s/https/i.ytimg.com/vi/d394R58URZI/hqdefault.jpg)](https://www.youtube.com/watch?v=d394R58URZI "Torcs A3C Demonstration Video")
 
 
 
