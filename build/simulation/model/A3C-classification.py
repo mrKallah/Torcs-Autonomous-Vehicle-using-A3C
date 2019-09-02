@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.multiprocessing as mp
+import numpy as np
 
 from utils import v_wrap, set_init, push_and_pull, record
 from shared_adam import SharedAdam
@@ -30,6 +31,7 @@ N_A = 3
 
 class Net(nn.Module):
     def __init__(self, s_dim, a_dim):
+
         super(Net, self).__init__()
         self.s_dim = s_dim
         self.a_dim = a_dim
@@ -41,6 +43,16 @@ class Net(nn.Module):
         self.distribution = torch.distributions.Categorical
 
     def forward(self, x):
+        if x.__class__ == np.asarray([]).__class__:
+            if np.max(x) > 1:
+                x = np.asarray(x, np.float32)
+                x = x * 1 / 255
+                x = np.resize(x, (224, 224, 3))
+                x = np.reshape(x, (3, 224, 224))
+            x = torch.from_numpy(x)
+            # x = x.unsqueeze_(0)
+            # x = x.view(-1)
+
         pi1 = F.relu6(self.pi1(x))
         logits = self.pi2(pi1)
         v1 = F.relu6(self.v1(x))
@@ -50,9 +62,13 @@ class Net(nn.Module):
     def choose_action(self, s):
         self.eval()
         logits, _ = self.forward(s)
-        prob = F.softmax(logits, dim=1).data
+
+        prob = F.softmax(logits).data
+        # prob = F.tanh(logits).data
         m = self.distribution(prob)
-        return m.sample().numpy()[0]
+        out = m.sample().numpy()
+        return out
+        # return m.sample().numpy()[0]
 
     def loss_func(self, s, a, v_t):
         self.train()
@@ -60,7 +76,7 @@ class Net(nn.Module):
         td = v_t - values
         c_loss = td.pow(2)
 
-        probs = F.softmax(logits, dim=1)
+        probs = F.softmax(logits)
         m = self.distribution(probs)
         exp_v = m.log_prob(a) * td.detach().squeeze()
         a_loss = -exp_v
@@ -85,7 +101,6 @@ class Worker(mp.Process):
             s = reset()
             #print("img_array", s)
             s = feature_vec(s)
-            print("feat", s)
 
             # s = self.env.reset()
             # feature_vec
@@ -98,12 +113,13 @@ class Worker(mp.Process):
                 a = self.lnet.choose_action(s)
                 # a = self.lnet.choose_action(v_wrap(s[None, :]))
                 s_, r, done = step(a)
+                s_ = feature_vec(s)
                 # s_, r, done, _ = self.env.step(a)
                 # feature_vec
-                print("a", a)
-                print("s_", s_)
-                print("r", r)
-                print("done", done)
+                # print("a", a)
+                # print("s_", s_)
+                # print("r", r)
+                # print("done", done)
                 if done:
                     r = -1
                 ep_r += r
@@ -114,8 +130,7 @@ class Worker(mp.Process):
                 # update global and assign to local net
                 if total_step % UPDATE_GLOBAL_ITER == 0 or done:  
                     # sync
-                    push_and_pull(self.opt, self.lnet, self.gnet, done, s_,
-                                  buffer_s, buffer_a, buffer_r, GAMMA)
+                    push_and_pull(self.opt, self.lnet, self.gnet, done, s_, buffer_s, buffer_a, buffer_r, GAMMA)
                     buffer_s, buffer_a, buffer_r = [], [], []
 
                     if done:  # done and print information
@@ -128,6 +143,10 @@ class Worker(mp.Process):
 
 
 if __name__ == "__main__":
+
+    from multiprocessing import set_start_method
+
+    set_start_method('spawn')
     # global network
     gnet = Net(N_S, N_A)
     # share the global parameters in multiprocessing
@@ -135,11 +154,12 @@ if __name__ == "__main__":
     opt = SharedAdam(gnet.parameters(), lr=0.0001)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.),
                                          mp.Queue())
+    worker_amount = mp.cpu_count()
+    worker_amount = 1
 
     # parallel training
-    workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue,
-               i) for i in range(1)]
-            #    i) for i in range(mp.cpu_count())]
+    workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(worker_amount)]
+
     [w.start() for w in workers]
     res = []                    # record episode reward to plot
     while True:

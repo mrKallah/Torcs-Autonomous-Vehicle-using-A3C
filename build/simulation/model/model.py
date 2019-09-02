@@ -3,49 +3,40 @@ import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
 import torch
+import cv2
 
 from helper import load_stuff
 
-is_cuda = torch.cuda.is_available()
+try:
+    is_cuda = torch.cuda.is_available()
+except:
+    is_cuda = False
+
+
 is_cuda = False
+
 
 # densenet121
 model = models.vgg16(pretrained=True)
 
 if is_cuda:
-   model = model.cuda()
-
-normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
-
-preprocess = transforms.Compose([
-   transforms.Resize(256),
-   transforms.CenterCrop(224),
-   transforms.ToTensor(),
-   normalize
-])
-
-if is_cuda:
-   preprocess = preprocess.cuda()
+    model = model.cuda()
 
 def feature_vec(img):
-    # temp = np.rollaxis(img, 0, 3)
 
-    temp = np.uint8(img)
+    if img.__class__ != np.asarray([]).__class__:
+        return img
+    # img = np.uint8(img)
+    img = np.asarray(img, np.float32)
+    img = np.resize(img, (224, 224, 3))
+    img = np.reshape(img, (3, 224, 224))
+    # img_pil = cv2.cvtColor(img_pil, cv2.COLOR_RGB2GRAY)
+    img = img * 1 / 255
+    img_tensor = torch.from_numpy(img)
+    img_tensor = img_tensor.unsqueeze_(0)
 
-    img_pil = Image.fromarray(temp)
-    print("infinite loop occurs at at line 38 in model.py, \n'img_tensor = preprocess(img_pil)'")
-    img_tensor = preprocess(img_pil)
-    print("eroor resolved") 
-    img_tensor_ = img_tensor.unsqueeze_(0)
-    return model.features(img_tensor_).view(-1)
+    if is_cuda:
+        img_tensor = img_tensor.cuda()
 
 
-# img, reward, done = load_stuff("pickled")
-# torch.Size([1, 512, 7, 7])
-# tensor([0., 0., 0.,  ..., 0., 0., 0.], grad_fn=<ViewBackward>)
-# torch.Size([25088])
-
-# feat = feature_vec(img)
-# print(feat)
-# print(feat.shape)
+    return model.features(img_tensor).view(-1)

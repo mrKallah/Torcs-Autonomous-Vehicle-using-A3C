@@ -8,8 +8,13 @@ import numpy as np
 
 
 def v_wrap(np_array, dtype=np.float32):
+
+    if np_array.__class__ != np.asarray([]).__class__:
+        return np_array
+
     if np_array.dtype != dtype:
         np_array = np_array.astype(dtype)
+
     return torch.from_numpy(np_array)
 
 
@@ -31,8 +36,10 @@ def push_and_pull(opt, lnet, gnet, done, s_, bs, ba, br, gamma):
         buffer_v_target.append(v_s_)
     buffer_v_target.reverse()
 
+    bs = bs[0]
+
     loss = lnet.loss_func(
-        v_wrap(np.vstack(bs)),
+        v_wrap(bs.detach().numpy()),
         v_wrap(np.array(ba), dtype=np.int64) if ba[0].dtype == np.int64 else v_wrap(np.vstack(ba)),
         v_wrap(np.array(buffer_v_target)[:, None]))
 
