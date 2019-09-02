@@ -1,3 +1,0 @@
-Create a file in /etc/udev/rules.d with the suffix .rules, e.g. local.rules, and add a line like this to it:
-
-ACTION=="add", KERNEL=="ttyUSB[0-1]*", MODE="0666"
