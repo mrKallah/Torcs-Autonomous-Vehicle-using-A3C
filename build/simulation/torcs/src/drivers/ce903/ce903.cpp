@@ -147,14 +147,18 @@ drive(int index, tCarElt* car, tSituation *s)
     //cout << "Distance from start: " << car->_distRaced + 100 << endl;
     //cout << "Distance from middle: " << car->_trkPos.toMiddle << endl;
     //cout << "Collision: " << car->_collision << endl;
-    int reward = 0;
+    float reward = 0;
     if (car->_trkPos.toMiddle < 1 && car->_trkPos.toMiddle > -1) {
-        reward += 1;
-         ///cout << "reward change = " <<  1 << endl;
+		//reward += 1
+        //reward += 2;
+		reward = 2;
+		
     } else {
-        reward -= 1;
-        //cout << "reward change = " <<  -abs(car->_trkPos.toMiddle) << endl;
-        //cout << "reward change = " <<  -1 << endl;
+        //reward -= 1;
+        //reward += 1;
+		reward = 1;
+		
+		
     }
     car->_reward = reward;
     //cout << "Reward = " << reward << endl;
@@ -185,5 +189,4 @@ static void
 shutdown(int index)
 {
 }
-
 
