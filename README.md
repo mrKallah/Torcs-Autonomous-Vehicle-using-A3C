@@ -6,9 +6,7 @@ To set up and run the project use the files inside the 'build' folder. More inst
 
 ## Example:
 
-[![Torcs A3C example video]](https://youtu.be/Lj77aspuhfE "Torcs A3C example video")
-
-[https://youtu.be/Lj77aspuhfE]
+[<iframe width="560" height="315" src="https://www.youtube.com/embed/Lj77aspuhfE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>]
 
 
 
