@@ -743,8 +743,22 @@ ReUpdate(void)
         glReadBuffer(GL_FRONT);
         glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
 		
-		std::cout << "server col = " << s->cars[0]->_collision << std::endl;
-		std::cout << "server rew = " << s->cars[0]->_reward << std::endl;
+		std::cout << "server _collision = " << s->cars[0]->_collision << std::endl;
+		std::cout << "server _reward = " << s->cars[0]->_reward << std::endl;
+		std::cout << "server _askRestart = " << s->cars[0]->_askRestart << std::endl;
+		
+		if (s->cars[0]->_askRestart){
+			std::cout << "Trying to restart ()" << std::endl;
+			//ReInfo->_reState = RE_STATE_RACE_STOP;				///dis work
+			//s->cars[0]->_askRestart = 0;							//dis work
+			
+			//ReInfo->s->_raceState = RM_RACE_PRESTART;
+			//ReStart();
+			ReRaceCleanup();
+			ReInfo->_reState = RE_STATE_PRE_RACE;
+			GfuiScreenActivate(ReInfo->_reGameScreen);
+			
+		}
 
         Exporter exporter = Exporter(img, vw, vh);
 		int col = int(s->cars[0]->_collision);
@@ -860,4 +874,5 @@ ReTimeMod (void *vcmd)
 	snprintf(buf, BUFSIZE, "Time x%.2f", 1.0 / ReInfo->_reTimeMult);
 	ReRaceMsgSet(buf, 5);
 }
+
 
