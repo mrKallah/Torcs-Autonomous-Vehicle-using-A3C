@@ -50,8 +50,6 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 
 # OpenAL
 	wget https://kcat.strangesoft.net/openal-releases/openal-soft-1.19.1.tar.bz2
-	tar -xf torcs_1.3.7+dfsg.orig.tar.xz
-	rm torcs_1.3.7+dfsg.orig.tar.xz
 
 	sudo tar xfvj openal-soft-1.19.1.tar.bz2
 
