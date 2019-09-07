@@ -42,6 +42,7 @@ using namespace std;
 static tTrack	*curTrack;
 
 string const HOME = getenv("HOME") ? getenv("HOME") : ".";
+string path = "/tesla";
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s); 
 static void newrace(int index, tCarElt* car, tSituation *s); 
@@ -49,6 +50,12 @@ static void drive(int index, tCarElt* car, tSituation *s);
 static void endrace(int index, tCarElt *car, tSituation *s);
 static void shutdown(int index);
 static int  InitFuncPt(int index, void *pt); 
+
+
+string reward_type = "start";
+string dsadsa = "start";
+string asdasd = "start";
+
 
 
 /* 
@@ -97,6 +104,33 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 static void  
 newrace(int index, tCarElt* car, tSituation *s) 
 { 
+    
+    ifstream instructions_file (HOME + path + "/run_parameters.csv");
+    string in;
+    if (instructions_file.is_open()) {
+        try{
+			getline(instructions_file, in, ',');
+            reward_type = in; 
+        } catch(const exception& e) {
+         cout << "in = " << in << endl;
+        }
+        try{
+			getline(instructions_file, in, ',');
+			asdasd = in; 
+        } catch (const exception& e) {
+         cout << "in = " << in << endl;
+        }
+        
+        try{
+			getline(instructions_file, in, ','); 
+			dsadsa = in;
+        } catch (const exception& e) {
+            cout << "in = " << in << endl;
+        }
+    } else {
+        cout << "----Could not open Driver Instructions----\n";
+    }
+    
 } 
 
 bool has_col = false;
@@ -114,9 +148,7 @@ drive(int index, tCarElt* car, tSituation *s)
      * car->_gearCmd 
      * car->_clutchCmd 
      */ 
-	
-	
-	ifstream instructions_file (HOME + "/tesla/drive_instructions.csv");
+	ifstream instructions_file (HOME + path + "/drive_instructions.csv");
     string in;
     bool no_instructions = true;
     float accel, steer;
@@ -144,27 +176,21 @@ drive(int index, tCarElt* car, tSituation *s)
     } else {
         cout << "----Could not open Driver Instructions----\n";
     }
-    //cout << "Distance from start: " << car->_distRaced + 100 << endl;
-    //cout << "Distance from middle: " << car->_trkPos.toMiddle << endl;
-    //cout << "Collision: " << car->_collision << endl;
-    float reward = 0;
-    if (car->_trkPos.toMiddle < 1 && car->_trkPos.toMiddle > -1) {
-		//reward += 1
-        //reward += 2;
-		reward = 2;
-		
+	
+	
+    
+    if (reward_type == "center"){
+        car->_reward = abs(car->_trkPos.toMiddle / 4) * 100;
     } else {
-        //reward -= 1;
-        //reward += 1;
-		reward = 1;
-		
-		
+        car->_reward = car->_distRaced + 95; //+95 as the vehicle starts 95m behind the goal line
     }
-    car->_reward = reward;
-    //cout << "Reward = " << reward << endl;
+    
+    
+    
+    
+    
     car->_brakeCmd = 0;
     car->_gearCmd = 1;
-    //car->_clutchCmd 
 	car->_accelCmd = accel;
 	car->_steerCmd = steer;
     car->_askRestart = (restart == 1);	
@@ -189,4 +215,5 @@ static void
 shutdown(int index)
 {
 }
+
 
