@@ -1,0 +1,6 @@
+UPDATE_GLOBAL_ITER = 5
+GAMMA = 0.00001 #0.9
+UTIL_LR = 0.01
+MAX_EP = 3000
+MAX_EP_STEP = 200
+learning_rate = 0.0002 # was 0.0002

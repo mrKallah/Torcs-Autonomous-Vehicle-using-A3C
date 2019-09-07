@@ -108,50 +108,49 @@ if __name__ == '__main__':
 
 
 def step(action):
-    # print("step, action = {}".format(action))
-
-    img = None
-    while img.__class__ == None.__class__:
-        img = recv_img()
-
-
-    if img is not None:
-        reward = 0
-        reward = int(img[0]) - 1
-        collision = int(img[1])
-        # print("collision = {} & reward = {}".format(collision, reward))
-        img = format_img(img)
-        drive_car(action, 0)
-        update(img)
-    else:
-        raise ValueError("No image was received")
-
+    img, reward, collision = recieve_data(action, 0)
     return (img, reward, collision)
-
+1
 
 def reset():
     with open('drive_instructions.csv', mode='w') as file:
         writer = csv.writer(file)
         writer.writerow([speed, 0, 1])  # [acceleration (0 - 1), turning (-1 - 1), restart (0 = no, 1 = yes)]
 
+    img, reward, collision = recieve_data(0, 0)
+    return (img)
+
+def recieve_data(action, reset):
     img = None
     while img.__class__ == None.__class__:
         img = recv_img()
 
-
     if img is not None:
-        reward = 0
-        reward = int(img[0]) - 1
+        # reward = (float(img[0]) / 100)
+        reward = float(img[0])
+
+        reward = 100 - reward
+
+        #reward = 1
+
+        # if reward < -99:
+        #     reward = 0
+
+        #reward = normallize(reward, 0, 100)
+
+        # if int(reward) != 02:
+        #      reward = 1
+
         collision = bool(img[1])
-        # print("col = {} && rew = {}".format(collision, reward))
         img = format_img(img)
-        # print("drive")
-        drive_car(0, 0)
+        drive_car(action, reset)
         update(img)
-        # print("return")
     else:
         raise ValueError("No image was received")
-    return (img)
 
+    return img, reward, collision
+
+def normallize(x, min, max):
+    return (x - min) / (max - min)
 
 speed = 0.05
