@@ -24,7 +24,7 @@ Exporter::Exporter(unsigned char* img, int width, int height){
 Exporter::~Exporter() {}
 
 void Exporter::resize_img(int& col, int& rew) {
-	cout << "Resizing....\n";
+	//cout << "Resizing....\n";
 	img_resize = (unsigned char*)malloc(230400);
 	int r, g, b;
 	for (int y = 0; y < height; y+=2) {
@@ -51,7 +51,7 @@ void Exporter::resize_img(int& col, int& rew) {
 	width = 320;
 	height = 240;
 	bufsize = width*height*3;
-	cout << "Resized!\n";
+	//cout << "Resized!\n";
 	
 	rew ++;
 	if (col > 1) {
@@ -61,7 +61,7 @@ void Exporter::resize_img(int& col, int& rew) {
 	*(img_resize + 0) = rew;
 	*(img_resize + 1) = col;
 	
-	cout << "pxl1 = " << *(img_resize + 0) << ", pxl2 = " << *(img_resize + 1) << endl;
+	//cout << "pxl1 = " << *(img_resize + 0) << ", pxl2 = " << *(img_resize + 1) << endl;
 	
 	
 }
@@ -71,7 +71,7 @@ void Exporter::create_save_file(char* path) {
 }
 
 void Exporter::save_to_file() {
-	cout << "Saving!\n";
+	//cout << "Saving!\n";
 	int pixel;
 	std::ofstream outfile;
 	outfile.open(path);
@@ -83,7 +83,7 @@ void Exporter::save_to_file() {
 				} else {outfile<<pixel<<",";}
 		}
 	} else {
-		cout << "<-----FILE OPEN FAILED----->" << endl;	
+		//cout << "<-----FILE OPEN FAILED----->" << endl;	
 	}
 	outfile.close();
 }
@@ -93,7 +93,7 @@ void Exporter::create_client(char * ip, int portnum) {
 	this->ip = ip;
 	client = socket(AF_INET, SOCK_STREAM, 0);
 	if (client < 0) {
-		cout << "ERROR establishing socket\n" << endl;
+		//cout << "ERROR establishing socket\n" << endl;
 		exit(1);
 	}
 
@@ -101,38 +101,39 @@ void Exporter::create_client(char * ip, int portnum) {
 	serv_addr.sin_port = htons(portnum);
 	inet_pton(AF_INET, ip, &serv_addr.sin_addr);
 
-	cout << "\n--> Socket client created...\n";
+	//cout << "\n--> Socket client created...\n";
 }
 
 bool Exporter::svr_connect() {
 	server = gethostbyname(ip);
 	if (server == NULL) {
-		cout << "<-----ERROR: SERVER DOES NOT EXIST----->";
+		//cout << "<-----ERROR: SERVER DOES NOT EXIST----->";
 		exit(0);
 	} else {
-		cout << "->Server Found->\n";
+		//cout << "->Server Found->\n";
 	}
 	if (connect(client, (const struct sockaddr*)&serv_addr, sizeof(serv_addr)) == 0) {
-		cout << "--> Connection to the server " << inet_ntoa(serv_addr.sin_addr)
-			<< " with port number: "
-			<< portnum << endl;
+		//cout << "--> Connection to the server " << inet_ntoa(serv_addr.sin_addr)
+		//	<< " with port number: "
+		//	<< portnum << endl;
 		return true;
 	} else {
-		cout << "<-----CONNECTION FAILED----->\n\n";
+		//cout << "<-----CONNECTION FAILED----->\n\n";
 		return false;
 	}
 }
 
 void Exporter::send_msg() {
-	cout << "->Sending....->\n\n";
+	//cout << "->Sending....->\n\n";
 	//std::string sName(reinterpret_cast<char*>(name));
-	cout << *(img_resize) << endl;
-	cout << *(img_resize+1000) << endl;
+	//cout << *(img_resize) << endl;
+	//cout << *(img_resize+1000) << endl;
 	send(client, img_resize, bufsize, 0);
-	cout << "------>Sent\n\n";
+	//cout << "------>Sent\n\n";
 }
 
 void Exporter::close_connection() {
 	close(client);
 }
+
 
