@@ -3,7 +3,7 @@ AI controller for autonomous cars
 
 ## Todo list
 - [ ] Tune the parameters for model and tried to make the model consistently learn. 
-- [x] [Kallah] Add possibility for c++ to read parameters from .ini file (currently in development, and using .csv)
+- [x] [Kallah] Add possibility for c++ to read parameters from .ini file 
 - [ ] Add more comments for c++
 - [ ] Add more comments to python code
 - [ ] Clean up the python code (I think some methods are unused and some methods can do with refractoring.)
