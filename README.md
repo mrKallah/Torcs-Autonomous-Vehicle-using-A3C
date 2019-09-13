@@ -11,7 +11,20 @@ This project should be considered as a proof of concept.
 - [ ] Tune the parameters for model and tried to make the model consistently learn. 
 - [x] [Kallah] Add possibility for c++ to read parameters from .ini file 
 - [ ] Add more comments for c++
+  -[ ] ce903.cpp/h
+  -[ ] exporter.cpp/h
+  -[ ] raceengine.cpp/h
+  -[ ] inireader.cpp/h
+  -[ ] car.h
 - [ ] Add more comments to python code
+  - [ ] classify.py
+  - [ ] helper.py
+  - [ ] model.py
+  - [ ] pro.py (consider renaming)
+  - [ ] server.py
+  - [ ] shared_adam.py (dont know what this is, investigate if needed and rename according to what it does if needed)
+  - [ ] util(s).py (add the utils and util scripts together if possible, refractoring needed)
+  - [ ] video_frame.py
 - [ ] Clean up the python code (I think some methods are unused and some methods can do with refractoring.)
 - [ ] Investigate different model achitectures for the A3C in order to increase performance
 - [ ] Detailed instructions for install
@@ -22,6 +35,9 @@ This project should be considered as a proof of concept.
 - [ ] Make the pre-processing into a class for more readable code
 - [ ] [Kallah] Remove default torcs files from the folder directory //(I've started this, but its harder than one would think, file x and y may have the same content but different dates etc, and so the python script I wrote to automatically get rid of anything that was unedited from the default torcs directory was not good enough as it does not ignore that kind of stuff)
 - [ ] Perhaps change to this implementation of A3C: https://github.com/awjuliani/DeepRL-Agents/blob/master/A3C-Doom.ipynb
+- [ ] Change to regression rather than classification for steering, maybe add accel too. (should be controlled by .ini param)
+- [ ] Add gears to ini parameter
+- [ ] Allow gear to be controlled by A3C by parameters
 
 ## Installation
 To set up and run the project use the files inside the 'build' folder. More instructions can be found there as well.
