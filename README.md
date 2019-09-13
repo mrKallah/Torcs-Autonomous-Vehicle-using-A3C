@@ -20,7 +20,7 @@ This project should be considered as a proof of concept.
 - [ ] [Kallah] Decrease the latency in torcs (we implemented a latency on sending the images, dont remember why)
 - [ ] Make the server into a class for more readable code
 - [ ] Make the pre-processing into a class for more readable code
-- [ ] [Kallah] Remove default torcs files from the folder directory //(I've started this, but its harder than one would think, file x - [ ] and y may have the same content but different dates etc, and so the python script I wrote to automatically get rid of anything that was unedited from the default torcs directory was not good enough as it does not ignore that kind of stuff)
+- [ ] [Kallah] Remove default torcs files from the folder directory //(I've started this, but its harder than one would think, file x and y may have the same content but different dates etc, and so the python script I wrote to automatically get rid of anything that was unedited from the default torcs directory was not good enough as it does not ignore that kind of stuff)
 - [ ] Perhaps change to this implementation of A3C: https://github.com/awjuliani/DeepRL-Agents/blob/master/A3C-Doom.ipynb
 
 ## Installation
