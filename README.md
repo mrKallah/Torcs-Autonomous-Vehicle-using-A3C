@@ -10,12 +10,12 @@ This project should be considered as a proof of concept.
 ## Todo list
 - [ ] Tune the parameters for model and tried to make the model consistently learn. 
 - [x] [Kallah] Add possibility for c++ to read parameters from .ini file 
-- [ ] Add more comments for c++
-  -[ ] ce903.cpp/h
-  -[ ] exporter.cpp/h
-  -[ ] raceengine.cpp/h
-  -[ ] inireader.cpp/h
-  -[ ] car.h
+- [ ] Add more comments for c++.
+  - [ ] ce903.cpp/h
+  - [ ] exporter.cpp/h
+  - [ ] raceengine.cpp/h
+  - [ ] inireader.cpp/h
+  - [ ] car.h
 - [ ] Add more comments to python code
   - [ ] classify.py
   - [ ] helper.py
