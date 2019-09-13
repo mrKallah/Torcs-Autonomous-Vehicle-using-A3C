@@ -36,8 +36,8 @@ This project should be considered as a proof of concept.
 - [ ] [Kallah] Remove default torcs files from the folder directory //(I've started this, but its harder than one would think, file x and y may have the same content but different dates etc, and so the python script I wrote to automatically get rid of anything that was unedited from the default torcs directory was not good enough as it does not ignore that kind of stuff)
 - [ ] Perhaps change to this implementation of A3C: https://github.com/awjuliani/DeepRL-Agents/blob/master/A3C-Doom.ipynb
 - [ ] Change to regression rather than classification for steering, maybe add accel too. (should be controlled by .ini param)
-- [ ] Add gears to ini parameter
-- [ ] Allow gear to be controlled by A3C by parameters
+- [ ] Allow for change of gears and add option to ini parameter
+- [ ] Allow for change of gears to be controlled by A3C, on/off by parameters
 
 ## Installation
 To set up and run the project use the files inside the 'build' folder. More instructions can be found there as well.
