@@ -729,7 +729,7 @@ ReUpdate(void)
     
 	//current = GfTimeClock();
     //if (current - ReInfo->_lastSend > 0) {
-    if (ReInfo->_count == 500) {
+    if (ReInfo->_count == 1) {
 		//ReInfo->_lastSend = current;
 
         GfScrGetSize(&sw, &sh, &vw, &vh);
@@ -747,24 +747,19 @@ ReUpdate(void)
 		//std::cout << "server _reward = " << s->cars[0]->_reward << std::endl;
 		//std::cout << "server _askRestart = " << s->cars[0]->_askRestart << std::endl;
 		
+		//restaring the race if the model requests it 
 		if (s->cars[0]->_askRestart){
-			//std::cout << "Trying to restart ()" << std::endl;
-			//ReInfo->_reState = RE_STATE_RACE_STOP;				///dis work
-			//s->cars[0]->_askRestart = 0;							//dis work
-			
-			//ReInfo->s->_raceState = RM_RACE_PRESTART;
-			//ReStart();
 			ReRaceCleanup();
 			ReInfo->_reState = RE_STATE_PRE_RACE;
 			GfuiScreenActivate(ReInfo->_reGameScreen);
-			
 		}
 
-        Exporter exporter = Exporter(img, vw, vh);
+        Exporter exporter = Exporter(vw, vh);
 		int col = int(s->cars[0]->_collision);
 		int rew = int(s->cars[0]->_reward);
 		
-        exporter.resize_img(col, rew);
+		
+        img = exporter.resize_img(col, rew, img);// current img is free'd within this function and a updated malloc is returned. 
 		
 		
 		
@@ -772,12 +767,14 @@ ReUpdate(void)
         exporter.create_client("0.0.0.0", 4321);	//CHANGE PORT NUMBER
         bool connected = exporter.svr_connect();
         if (connected) {
-            exporter.send_msg();
+            exporter.send_msg(img);
         }
         exporter.close_connection();
         exporter.~Exporter();
-        free(img);
         ReInfo->_count = 0;
+		
+		free(img);
+		
     } else {
         ReInfo->_count++;
     }

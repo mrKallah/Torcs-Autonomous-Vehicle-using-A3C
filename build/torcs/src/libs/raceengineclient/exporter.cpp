@@ -14,18 +14,20 @@
 
 using namespace std;
 
-Exporter::Exporter(unsigned char* img, int width, int height){
-	this->img = img;
+Exporter::Exporter(int width, int height){
 	this->width = width;
 	this->height = height;
 	bufsize = width*height*3;
 }
 
-Exporter::~Exporter() {}
+Exporter::~Exporter() {
 
-void Exporter::resize_img(int& col, int& rew) {
+}
+
+unsigned char* Exporter::resize_img(int& col, int& rew, unsigned char* img) {
 	//cout << "Resizing....\n";
-	img_resize = (unsigned char*)malloc(230400);
+	
+	unsigned char* img_resize = (unsigned char*)malloc(230400);
 	int r, g, b;
 	for (int y = 0; y < height; y+=2) {
 		for (int x = 0; x < width; x+=2) {
@@ -48,29 +50,23 @@ void Exporter::resize_img(int& col, int& rew) {
 		}
 	}
 	//img = img_resize;
-	width = 320;
-	height = 240;
-	bufsize = width*height*3;
+	//width = 320;
+	//height = 240;
+	//bufsize = width*height*3;
 	//cout << "Resized!\n";
 	
-	rew ++;
-	if (col > 1) {
-		col = 1;
-	}
 		
 	*(img_resize + 0) = rew;
 	*(img_resize + 1) = col;
-	
-	//cout << "pxl1 = " << *(img_resize + 0) << ", pxl2 = " << *(img_resize + 1) << endl;
-	
-	
+	free(img);
+	return img_resize;
 }
 
 void Exporter::create_save_file(char* path) {
 	this->path = path;
 }
 
-void Exporter::save_to_file() {
+void Exporter::save_to_file(unsigned char* img) {
 	//cout << "Saving!\n";
 	int pixel;
 	std::ofstream outfile;
@@ -123,13 +119,8 @@ bool Exporter::svr_connect() {
 	}
 }
 
-void Exporter::send_msg() {
-	//cout << "->Sending....->\n\n";
-	//std::string sName(reinterpret_cast<char*>(name));
-	//cout << *(img_resize) << endl;
-	//cout << *(img_resize+1000) << endl;
-	send(client, img_resize, bufsize, 0);
-	//cout << "------>Sent\n\n";
+void Exporter::send_msg(unsigned char* img) {
+	send(client, img, bufsize, 0);
 }
 
 void Exporter::close_connection() {
