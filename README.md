@@ -40,6 +40,8 @@ This project should be considered as a proof of concept.
 - [ ] Allow for change of gears to be controlled by A3C, on/off by parameters
 - [x] Solve memory issue in torcs exporter class. SOLUTION: memory leak due to bad memalloc() with non-sane free() methodology. 
 - [ ] allow for multiple torcs clients running by having a port number file increment, I.E. client 1 reads port 200, writes port 201 which the next client uses and so on. 
+- [ ] look into restart memory leak which is apparently inherrent to TORCS itself. each reload uses approx 100-200mb of ram
+
 ## Installation
 To set up and run the project use the files inside the 'build' folder. More instructions can be found there as well.
 
