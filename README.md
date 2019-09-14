@@ -38,7 +38,7 @@ This project should be considered as a proof of concept.
 - [ ] Change to regression rather than classification for steering, maybe add accel too. (should be controlled by .ini param)
 - [ ] Allow for change of gears and add option to ini parameter
 - [ ] Allow for change of gears to be controlled by A3C, on/off by parameters
-- [ ] Solve memory issue in torcs related to restarts, the exporter or processing of images (no clue which yet)
+- [x] Solve memory issue in torcs related to restarts, the exporter or processing of images (no clue which yet)
 - [ ] allow for multiple torcs clients running by having a port number file increment, I.E. client 1 reads port 200, writes port 201 which the next client uses and so on. 
 ## Installation
 To set up and run the project use the files inside the 'build' folder. More instructions can be found there as well.
