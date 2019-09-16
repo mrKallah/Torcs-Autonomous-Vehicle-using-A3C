@@ -30,7 +30,7 @@ This project should be considered as a proof of concept.
 - [ ] Detailed instructions for install
 - [ ] Detailed instructions for use
 - [ ] Detailed instructions for further development
-- [ ] [Kallah] Decrease the latency in torcs (we implemented a latency on sending the images, dont remember why)
+- [x] [Kallah] Decrease the latency in torcs (we implemented a latency on sending the images, dont remember why)
 - [ ] Make the server into a class for more readable code
 - [ ] Make the pre-processing into a class for more readable code
 - [ ] [Kallah] Remove default torcs files from the folder directory //(I've started this, but its harder than one would think, file x and y may have the same content but different dates etc, and so the python script I wrote to automatically get rid of anything that was unedited from the default torcs directory was not good enough as it does not ignore that kind of stuff)
@@ -38,7 +38,7 @@ This project should be considered as a proof of concept.
 - [ ] Change to regression rather than classification for steering, maybe add accel too. (should be controlled by .ini param)
 - [ ] Allow for change of gears and add option to ini parameter
 - [ ] Allow for change of gears to be controlled by A3C, on/off by parameters
-- [x] Solve memory issue in torcs exporter class. SOLUTION: memory leak due to bad memalloc() with non-sane free() methodology. 
+- [x] [Kallah] Solve memory issue in torcs exporter class. SOLUTION: memory leak due to bad memalloc() with non-sane free() methodology. 
 - [ ] allow for multiple torcs clients running by having a port number file increment, I.E. client 1 reads port 200, writes port 201 which the next client uses and so on. 
 - [ ] look into restart memory leak which is apparently inherrent to TORCS itself. each reload uses approx 100-200mb of ram
 - [ ] make the pre-processing image into a boolean image. This could help the model avoid local optima, would be similar to semantic segmentation as seen in https://arxiv.org/pdf/1801.05299.pdf, however without the sementics as onyl the road is maintained in the image fed to the model. 
