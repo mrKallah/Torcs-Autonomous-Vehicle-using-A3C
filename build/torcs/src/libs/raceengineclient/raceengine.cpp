@@ -729,23 +729,27 @@ ReUpdate(void)
     
 	//current = GfTimeClock();
     //if (current - ReInfo->_lastSend > 0) {
-    if (ReInfo->_count == 1) {
+    // this ifstatement controls how often to try to send the image to the model. 
+	//If 1 it sends it each step, if 200 it sends it each 200th step
+	if (ReInfo->_count == 1) {
 		//ReInfo->_lastSend = current;
-
+		
+		//This allocates a memory possition for the image. 
         GfScrGetSize(&sw, &sh, &vw, &vh);
         img = (unsigned char*)malloc(vw * vh * 3);
         if (img == NULL) {
             std::cout << "<-----Failed to Secure Memory Location----->" << "\n";
         }
-
+		
+		//This extracts the image from the video buffer
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         glReadBuffer(GL_FRONT);
         glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
 		
+		//here the status of the vehicle is printed. 
 		std::cout << "_collision = " << s->cars[0]->_collision << "\t_reward = " << s->cars[0]->_reward << "\t_askRestart = " << s->cars[0]->_askRestart << std::endl;
-		//std::cout << "server _reward = " << s->cars[0]->_reward << std::endl;
-		//std::cout << "server _askRestart = " << s->cars[0]->_askRestart << std::endl;
+
 		
 		//restaring the race if the model requests it 
 		if (s->cars[0]->_askRestart){
@@ -753,26 +757,32 @@ ReUpdate(void)
 			ReInfo->_reState = RE_STATE_PRE_RACE;
 			GfuiScreenActivate(ReInfo->_reGameScreen);
 		}
-
+		
+		//here the exporter is created and the collision and reward variables are stored locally. 
         Exporter exporter = Exporter(vw, vh);
 		int col = int(s->cars[0]->_collision);
 		int rew = int(s->cars[0]->_reward);
 		
+		// the image is converted from one shape to another. (Not sure from what to what)
+		// current img is free'd within this function and a updated malloc is returned. 
+        img = exporter.resize_img(col, rew, img);
 		
-        img = exporter.resize_img(col, rew, img);// current img is free'd within this function and a updated malloc is returned. 
 		
 		
-		
+		// here the image is exported from this program to the model in Python
         //exporter.save_to_file();
         exporter.create_client("0.0.0.0", 4321);	//CHANGE PORT NUMBER
         bool connected = exporter.svr_connect();
         if (connected) {
             exporter.send_msg(img);
         }
+		
+		// the conncection is closed.
         exporter.close_connection();
         exporter.~Exporter();
         ReInfo->_count = 0;
 		
+		// The malloc is freed. 
 		free(img);
 		
     } else {

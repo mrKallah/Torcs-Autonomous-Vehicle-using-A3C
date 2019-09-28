@@ -24,6 +24,10 @@ Exporter::~Exporter() {
 
 }
 
+/*	This method reshapes the image form an unknown shape (needs further looking into) to a
+	rgb image where each of the different channels contains only one color. 
+	This method also encodes the reward and collition state into the image for sending. 
+*/
 unsigned char* Exporter::resize_img(int& col, int& rew, unsigned char* img) {
 	//cout << "Resizing....\n";
 	
@@ -66,6 +70,9 @@ void Exporter::create_save_file(char* path) {
 	this->path = path;
 }
 
+/*	!!!deprecated due to time complexity, should be removed
+	This saves the image to file, from before server client was established. 
+*/
 void Exporter::save_to_file(unsigned char* img) {
 	//cout << "Saving!\n";
 	int pixel;
@@ -84,6 +91,8 @@ void Exporter::save_to_file(unsigned char* img) {
 	outfile.close();
 }
 
+/*	this creates the socket for the client. 
+*/
 void Exporter::create_client(char * ip, int portnum) {
 	this->portnum = portnum;
 	this->ip = ip;
@@ -100,6 +109,7 @@ void Exporter::create_client(char * ip, int portnum) {
 	//cout << "\n--> Socket client created...\n";
 }
 
+// Connects the client to the python server.
 bool Exporter::svr_connect() {
 	server = gethostbyname(ip);
 	if (server == NULL) {
@@ -119,10 +129,11 @@ bool Exporter::svr_connect() {
 	}
 }
 
+// sends the image to the python server.
 void Exporter::send_msg(unsigned char* img) {
 	send(client, img, bufsize, 0);
 }
-
+// closes connection
 void Exporter::close_connection() {
 	close(client);
 }
