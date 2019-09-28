@@ -11,11 +11,11 @@ This project should be considered as a proof of concept.
 - [ ] Tune the parameters for model and tried to make the model consistently learn. 
 - [x] [Kallah] Add possibility for c++ to read parameters from .ini file 
 - [ ] Add more comments for c++.
-  - [ ] ce903.cpp/h
-  - [ ] exporter.cpp/h
-  - [ ] raceengine.cpp/h
-  - [ ] inireader.cpp/h
-  - [ ] car.h
+  - [x] ce903.cpp/h
+  - [x] exporter.cpp/h
+  - [x] raceengine.cpp/h
+  - [x] inireader.cpp/h
+  - [x] car.h
 - [ ] Add more comments to python code
   - [ ] classify.py
   - [ ] helper.py
@@ -42,6 +42,9 @@ This project should be considered as a proof of concept.
 - [ ] allow for multiple torcs clients running by having a port number file increment, I.E. client 1 reads port 200, writes port 201 which the next client uses and so on. 
 - [ ] look into restart memory leak which is apparently inherrent to TORCS itself. each reload uses approx 100-200mb of ram
 - [ ] make the pre-processing image into a boolean image. This could help the model avoid local optima, would be similar to semantic segmentation as seen in https://arxiv.org/pdf/1801.05299.pdf, however without the sementics as onyl the road is maintained in the image fed to the model. 
+- [ ] change the driver instructions to be a ini file rather than a csv file for more readable code, avoid duplicate code and to make the driver instructions more readable. 
+- [ ] rename the resize_img function in the exporter class to reshape_img, as it reshapes, it does not resize. 
+- [ ] find and get rid of unused methods in the exporter class. (I think some methods are redundant)
 
 ## Installation
 To set up and run the project use the files inside the 'build' folder. More instructions can be found there as well.
