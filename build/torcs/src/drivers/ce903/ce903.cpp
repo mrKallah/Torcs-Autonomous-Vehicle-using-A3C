@@ -44,9 +44,8 @@ static void shutdown(int index);
 static int  InitFuncPt(int index, void *pt); 
 
 
-string reward_type = "start";
-string dsadsa = "start";
-string asdasd = "start";
+string reward_type = "";
+
 
 
 
@@ -126,32 +125,47 @@ static void drive(int index, tCarElt* car, tSituation *s) {
      */ 
 	ifstream instructions_file (HOME + path + "/drive_instructions.csv");
     string in;
-    bool no_instructions = true;
     float accel, steer;
     int restart;
-    if (instructions_file.is_open()) {
-        try{
-			getline(instructions_file, in, ',');
-            accel = stof(in); 
-        } catch(const exception& e) {
-         cout << "in = " << in << endl;
-        }
-        try{
-			getline(instructions_file, in, ',');
-			steer = stof(in); 
-        } catch (const exception& e) {
-         cout << "in = " << in << endl;
-        }
-        
-        try{
-			getline(instructions_file, in, ','); 
-			restart = stoi(in);
-        } catch (const exception& e) {
-            cout << "in = " << in << endl;
-        }
-    } else {
-        cout << "----Could not open Driver Instructions----\n";
-    }
+	
+	string inifile (HOME + path + "/instructions.ini");
+	// find_var(filename, category, value name, variable to assign value to)
+	string tmp = "";
+	find_var(inifile, "steer", "accel", tmp);
+	accel = stof(tmp);
+	
+	find_var(inifile, "steer", "steer", tmp);
+	steer = stof(tmp);
+	
+	find_var(inifile, "steer", "restart", tmp);
+	restart = stoi(tmp);
+	
+	
+	
+	
+    //if (instructions_file.is_open()) {
+    //    try{
+	//		getline(instructions_file, in, ',');
+    //        accel = stof(in); 
+    //    } catch(const exception& e) {
+    //     cout << "in = " << in << endl;
+    //    }
+    //    try{
+	//		getline(instructions_file, in, ',');
+	//		steer = stof(in); 
+    //    } catch (const exception& e) {
+    //     cout << "in = " << in << endl;
+    //    }
+    //    
+    //    try{
+	//		getline(instructions_file, in, ','); 
+	//		restart = stoi(in);
+    //    } catch (const exception& e) {
+    //        cout << "in = " << in << endl;
+    //    }
+    //} else {
+    //    cout << "----Could not open Driver Instructions----\n";
+    //}
 	
 	
     

@@ -16,6 +16,7 @@ string makelower(const string & s);
 string clear_spaces(string &s);
 string clear_comments(string &s);
 string clean(string &s);
+string rmsquare(string &s);
 void split(string s, string &a, string &b);
 vector <vector<string>> readConfigFile(string & inifile);
 void find_var(string inifile, string type, string variable, string &value);
