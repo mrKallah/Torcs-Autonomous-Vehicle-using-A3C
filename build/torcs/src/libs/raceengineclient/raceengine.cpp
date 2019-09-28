@@ -765,7 +765,7 @@ ReUpdate(void)
 		
 		// the image is converted from one shape to another. (Not sure from what to what)
 		// current img is free'd within this function and a updated malloc is returned. 
-        img = exporter.resize_img(col, rew, img);
+        img = exporter.reshape(col, rew, img);
 		
 		
 		

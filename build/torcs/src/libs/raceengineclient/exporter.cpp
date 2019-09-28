@@ -28,7 +28,7 @@ Exporter::~Exporter() {
 	rgb image where each of the different channels contains only one color. 
 	This method also encodes the reward and collition state into the image for sending. 
 */
-unsigned char* Exporter::resize_img(int& col, int& rew, unsigned char* img) {
+unsigned char* Exporter::reshape(int& col, int& rew, unsigned char* img) {
 	//cout << "Resizing....\n";
 	
 	unsigned char* img_resize = (unsigned char*)malloc(230400);
@@ -53,12 +53,6 @@ unsigned char* Exporter::resize_img(int& col, int& rew, unsigned char* img) {
 			*(img_resize + ((width*3*y/4) + (x*3/2))+2) = b;
 		}
 	}
-	//img = img_resize;
-	//width = 320;
-	//height = 240;
-	//bufsize = width*height*3;
-	//cout << "Resized!\n";
-	
 		
 	*(img_resize + 0) = rew;
 	*(img_resize + 1) = col;
@@ -66,40 +60,14 @@ unsigned char* Exporter::resize_img(int& col, int& rew, unsigned char* img) {
 	return img_resize;
 }
 
-void Exporter::create_save_file(char* path) {
-	this->path = path;
-}
 
-/*	!!!deprecated due to time complexity, should be removed
-	This saves the image to file, from before server client was established. 
-*/
-void Exporter::save_to_file(unsigned char* img) {
-	//cout << "Saving!\n";
-	int pixel;
-	std::ofstream outfile;
-	outfile.open(path);
-	if (outfile.is_open()) {
-		for (int i=0; i < width*height*3; i++) {
-			pixel = *(img+i);
-			if ((i!=0) && ((i%(width*3))==0)) {outfile<<"\n";}
-			if (((i+1)%(width*3))==0) {outfile<<pixel;
-				} else {outfile<<pixel<<",";}
-		}
-	} else {
-		//cout << "<-----FILE OPEN FAILED----->" << endl;	
-	}
-	outfile.close();
-}
-
-/*	this creates the socket for the client. 
-*/
 void Exporter::create_client(char * ip, int portnum) {
 	this->portnum = portnum;
 	this->ip = ip;
 	client = socket(AF_INET, SOCK_STREAM, 0);
 	if (client < 0) {
-		//cout << "ERROR establishing socket\n" << endl;
-		exit(1);
+		cout << "ERROR establishing socket\n" << endl;
+		exit(-1);
 	}
 
 	serv_addr.sin_family = AF_INET;
@@ -113,8 +81,8 @@ void Exporter::create_client(char * ip, int portnum) {
 bool Exporter::svr_connect() {
 	server = gethostbyname(ip);
 	if (server == NULL) {
-		//cout << "<-----ERROR: SERVER DOES NOT EXIST----->";
-		exit(0);
+		cout << "<-----ERROR: SERVER DOES NOT EXIST----->";
+		exit(-1);
 	} else {
 		//cout << "->Server Found->\n";
 	}

@@ -13,13 +13,9 @@ public:
 
 	~Exporter();
 
-	unsigned char* resize_img(int& col, int& rew, unsigned char* img);
+	unsigned char* reshape(int& col, int& rew, unsigned char* img);
 
-	void create_save_file(char* path);
-
-	void save_to_file(unsigned char* img);
-
-	void create_client(char * ip, int portnum);
+	void create_client(char * ip, int portnum); 
 
 	bool svr_connect();
 
@@ -32,9 +28,6 @@ public:
 	int client, portnum;
 	int bufsize = 1024;
 	char * ip;
-
-	//unsigned char *img;
-	//unsigned char *img_resize;
 
 	struct sockaddr_in serv_addr;
 	struct hostent* server;
