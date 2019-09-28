@@ -6,15 +6,6 @@
 
  ***************************************************************************/
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -35,6 +26,7 @@
 #include <raceman.h> 
 #include <robottools.h>
 #include <robot.h>
+#include "ini_reader.h"
 
 
 using namespace std;
@@ -93,51 +85,35 @@ InitFuncPt(int index, void *pt)
 } 
 
 /* Called for every track change or new race. */
-static void  
-initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s) 
-{ 
+static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s) { 
     curTrack = track;
     *carParmHandle = NULL; 
 } 
 
-/* Start a new race. */
-static void  
-newrace(int index, tCarElt* car, tSituation *s) 
-{ 
+/* 	Anything needed to be called at the start of a new race. 
+	This function is ran at the start of each new race, including restarts. 
+	Any parameters that needs to be read from ini file goes in here.
+*/
+static void newrace(int index, tCarElt* car, tSituation *s) { 
     
-    ifstream instructions_file (HOME + path + "/run_parameters.csv");
-    string in;
-    if (instructions_file.is_open()) {
-        try{
-			getline(instructions_file, in, ',');
-            reward_type = in; 
-        } catch(const exception& e) {
-         cout << "in = " << in << endl;
-        }
-        try{
-			getline(instructions_file, in, ',');
-			asdasd = in; 
-        } catch (const exception& e) {
-         cout << "in = " << in << endl;
-        }
-        
-        try{
-			getline(instructions_file, in, ','); 
-			dsadsa = in;
-        } catch (const exception& e) {
-            cout << "in = " << in << endl;
-        }
-    } else {
-        cout << "----Could not open Driver Instructions----\n";
-    }
+    string inifile (HOME + path + "/torcs.ini");
+	// find_var(filename, category, value name, variable to assign value to)
+	find_var(inifile, "torcs", "reward_type", reward_type);
+	
+	cout << "###############################################" << endl;
+	cout << "##### Startinga new race with parameters: " << endl;
+	cout << "# Reward type = " << reward_type << endl;
+	cout << "###############################################" << endl;
+	
     
 } 
 
 bool has_col = false;
-/* Drive during race. */
-static void  
-drive(int index, tCarElt* car, tSituation *s) 
-{ 
+/*	Drive during race. 
+	This method reads the instruction file to know what actions to perform. 
+	It then uses those instructions to change the output of the vehicle.
+*/
+static void drive(int index, tCarElt* car, tSituation *s) { 
     memset((void *)&car->ctrl, 0, sizeof(tCarCtrl)); 
     
     /*  
