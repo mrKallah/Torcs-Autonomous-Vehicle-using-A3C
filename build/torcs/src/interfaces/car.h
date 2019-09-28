@@ -339,8 +339,8 @@ typedef struct {
 #define _skid		priv.skid
 #define _reaction	priv.reaction
 #define _dammage	priv.dammage
-#define _collision	priv.collision
-#define _reward		priv.reward
+#define _collision	priv.collision // used for ce903
+#define _reward		priv.reward // used for ce903
 
 
 /** Info returned by driver during the race */
