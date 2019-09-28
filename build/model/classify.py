@@ -1,29 +1,60 @@
 # Credit: Original implementation was based on https://github.com/ikostrikov/pytorch-a3c
-import torch
+
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.multiprocessing as mp
 import numpy as np
-
-from utils import v_wrap, set_init, push_and_pull, record
-from shared_adam import SharedAdam
-# import gym
+import torchvision.models as models
+import torch
+from torch import manual_seed
 import os
+
+
+
+from server import step, reset
+from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate, eps, betas
+from utils import set_init, push_and_pull, record
+
+
+try:
+    is_cuda = torch.cuda.is_available()
+except:
+    is_cuda = False
+
+
+is_cuda = False
+
+manual_seed(0)
+
+# densenet121
+model = models.vgg16(pretrained=True)
+
+if is_cuda:
+    model = model.cuda()
+
 os.environ["OMP_NUM_THREADS"] = "1"
 
-from model import feature_vec
-from server import step, reset
-
-from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate
-
-# game_name = 'MountainCar-v0'
-game_name = 'CartPole-v0'
-# env = gym.make(game_name)
-
 N_S = 25088
-# env.observation_space.shape[0]
 N_A = 3
-# env.action_space.n
+
+
+class SharedAdam(torch.optim.Adam):
+    """
+    Shared optimizer, the parameters in the optimizer will shared in the multiprocessors.
+    """
+    def __init__(self, params, lr=learning_rate, betas=betas, eps=eps, weight_decay=0):
+        super(SharedAdam, self).__init__(params, lr=lr, betas=betas, eps=eps, weight_decay=weight_decay)
+        # State initialization
+        for group in self.param_groups:
+            for p in group['params']:
+                state = self.state[p]
+                state['step'] = 0
+                state['exp_avg'] = torch.zeros_like(p.data)
+                state['exp_avg_sq'] = torch.zeros_like(p.data)
+
+                # share in memory
+                state['exp_avg'].share_memory_()
+                state['exp_avg_sq'].share_memory_()
 
 
 class Net(nn.Module):
@@ -47,8 +78,6 @@ class Net(nn.Module):
                 x = np.resize(x, (224, 224, 3))
                 x = np.reshape(x, (3, 224, 224))
             x = torch.from_numpy(x)
-            # x = x.unsqueeze_(0)
-            # x = x.view(-1)
 
         pi1 = F.relu6(self.pi1(x))
         logits = self.pi2(pi1)
@@ -64,7 +93,6 @@ class Net(nn.Module):
         m = self.distribution(prob)
         out = m.sample().numpy()
         return out
-        # return m.sample().numpy()[0]
 
     def loss_func(self, s, a, v_t):
         self.train()
@@ -89,7 +117,6 @@ class Worker(mp.Process):
         self.gnet, self.opt = gnet, opt
         # local network
         self.lnet = Net(N_S, N_A)
-        # self.env = gym.make(game_name).unwrapped
 
     def run(self):
         total_step = 1
@@ -98,29 +125,17 @@ class Worker(mp.Process):
             #print("img_array", s)
             s = feature_vec(s)
 
-            # s = self.env.reset()
             # feature_vec
             buffer_s, buffer_a, buffer_r = [], [], []
             ep_r = 0.0
             while True:
-                r = 0
-                # if self.name == 'w0':
-                    # self.env.render()
-                    # feature_vec
                 a = self.lnet.choose_action(s)
-                # a = self.lnet.choose_action(v_wrap(s[None, :]))
                 s_, r, done = step(a)
                 s_ = feature_vec(s)
 
 
-                print("action = {}, reward = {}, episode reward = {}, restart = {}".format(a-1, r, ep_r, done))
+                print("action = {}, reward = {}, episode reward = {}, restart = {}".format(a-1, round(r, 2), round(ep_r, 2), done))
 
-                # s_, r, done, _ = self.env.step(a)
-                # feature_vec
-                # print("a", a)
-                # print("s_", s_)
-                # print("r", r)
-                # print("done", done)
                 ep_r += r
                 buffer_a.append(a)
                 buffer_s.append(s)
@@ -141,6 +156,23 @@ class Worker(mp.Process):
         self.res_queue.put(None)
 
 
+def feature_vec(img):
+
+    if img.__class__ != np.asarray([]).__class__:
+        return img
+    img = np.asarray(img, np.float32)
+    img = np.resize(img, (224, 224, 3))
+    img = np.reshape(img, (3, 224, 224))
+    img = img * 1 / 255
+    img_tensor = torch.from_numpy(img)
+    img_tensor = img_tensor.unsqueeze_(0)
+
+    if is_cuda:
+        img_tensor = img_tensor.cuda()
+
+    return model.features(img_tensor).view(-1)
+
+
 if __name__ == "__main__":
 
     from multiprocessing import set_start_method
@@ -151,8 +183,7 @@ if __name__ == "__main__":
     # share the global parameters in multiprocessing
     gnet.share_memory()
     opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
-    global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.),
-                                         mp.Queue())
+    global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.), mp.Queue())
     worker_amount = mp.cpu_count()
     worker_amount = 1
 

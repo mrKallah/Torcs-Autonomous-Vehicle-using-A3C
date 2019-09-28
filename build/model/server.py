@@ -86,10 +86,22 @@ def dump(filename="Untitled", data=None):
 
 
 def drive_car(action, reset):
-    with open('drive_instructions.csv', mode='w') as file:
-        writer = csv.writer(file)
-        _action = action - 1
-        writer.writerow([speed, _action, reset])  # [acceleration (0 - 1), turning (-1 - 1), restart (0 = no, 1 = yes)]
+    f = open("instructions.ini", "w")
+    _action = action - 1
+    f.write("[steer]\naccel={}\nsteer={}\nrestart={}\n".format(speed, _action, reset))
+    f.write("[steer]\n")
+    f.write("accel={}\n".format(speed))
+    f.write("steer={}\n".format(_action))
+    f.write("restart={}\n".format(reset))
+    f.close()
+
+    # with open('instructions.ini', mode='w') as file:
+    #     writer = csv.writer(file)
+    #     _action = action - 1
+    #     writer.writerow("[steer]")
+    #     writer.writerow("accel={}".format(speed))
+    #     writer.writerow("steer={}".format(_action))
+    #     writer.writerow("restart={}".format(reset))
 
 
 def main():
@@ -113,9 +125,9 @@ def step(action):
 1
 
 def reset():
-    with open('drive_instructions.csv', mode='w') as file:
-        writer = csv.writer(file)
-        writer.writerow([speed, 0, 1])  # [acceleration (0 - 1), turning (-1 - 1), restart (0 = no, 1 = yes)]
+    f = open("instructions.ini", "w")
+    f.write("[steer]\naccel={}\nsteer={}\nrestart={}\n".format(speed, 0, 1))
+    f.close()
 
     img, reward, collision = recieve_data(0, 0)
     return (img)
@@ -129,7 +141,7 @@ def recieve_data(action, reset):
         # reward = (float(img[0]) / 100)
         reward = float(img[0])
 
-        reward = 100 - reward
+        reward = 1-(reward/100)
 
         #reward = 1
 
@@ -142,6 +154,10 @@ def recieve_data(action, reset):
         #      reward = 1
 
         collision = bool(img[1])
+
+        img[0] = 0
+        img[1] = 0
+
         img = format_img(img)
         drive_car(action, reset)
         update(img)
