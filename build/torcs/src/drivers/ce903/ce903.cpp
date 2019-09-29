@@ -126,7 +126,7 @@ static void drive(int index, tCarElt* car, tSituation *s) {
 	ifstream instructions_file (HOME + path + "/drive_instructions.csv");
     string in;
     float accel, steer;
-    int restart;
+    int restart, gear, clutch, brake;
 	
 	string inifile (HOME + path + "/instructions.ini");
 	// find_var(filename, category, value name, variable to assign value to)
@@ -140,32 +140,23 @@ static void drive(int index, tCarElt* car, tSituation *s) {
 	find_var(inifile, "steer", "restart", tmp);
 	restart = stoi(tmp);
 	
+	find_var(inifile, "steer", "gear", tmp);
+	gear = stoi(tmp);
 	
+	find_var(inifile, "steer", "clutch", tmp);
+	clutch = stoi(tmp);
 	
+	find_var(inifile, "steer", "brake", tmp);
+	brake = stoi(tmp);
 	
-    //if (instructions_file.is_open()) {
-    //    try{
-	//		getline(instructions_file, in, ',');
-    //        accel = stof(in); 
-    //    } catch(const exception& e) {
-    //     cout << "in = " << in << endl;
-    //    }
-    //    try{
-	//		getline(instructions_file, in, ',');
-	//		steer = stof(in); 
-    //    } catch (const exception& e) {
-    //     cout << "in = " << in << endl;
-    //    }
-    //    
-    //    try{
-	//		getline(instructions_file, in, ','); 
-	//		restart = stoi(in);
-    //    } catch (const exception& e) {
-    //        cout << "in = " << in << endl;
-    //    }
-    //} else {
-    //    cout << "----Could not open Driver Instructions----\n";
-    //}
+	 /*  
+     * add the driving code here to modify the 
+     * car->_steerCmd 
+     * car->_accelCmd 
+     * car->_brakeCmd 
+     * car->_gearCmd 
+     * car->_clutchCmd 
+     */ 
 	
 	
     
@@ -176,14 +167,29 @@ static void drive(int index, tCarElt* car, tSituation *s) {
     }
     
     
-    
-    
-    
-    car->_brakeCmd = 0;
-    car->_gearCmd = 1;
-	car->_accelCmd = accel;
+	// sets the appropriate vehicle commands which have previously been read from the instructions
+	car->_askRestart = (restart == 1);	
 	car->_steerCmd = steer;
-    car->_askRestart = (restart == 1);	
+    car->_accelCmd = accel;
+	car->_clutchCmd = clutch;
+    car->_brakeCmd = brake;
+    car->_gearCmd = gear;
+	
+	
+    //here the status of the vehicle is printed. 
+    cout	<< "collision = " << car->_collision 
+			<< "\n" << "reward = " << car->_reward
+			<< "\n" << "restart = " << car->_askRestart
+			<< "\n" << "steer = " << car->_steerCmd
+			<< "\n" << "speed = " << car->_accelCmd
+			<< "\n" << "clutch = " << car->_clutchCmd
+			<< "\n" << "brake = " << car->_brakeCmd
+			<< "\n" << "gear = " << car->_gearCmd 
+			<< endl;
+	cout << "###################################" << endl;
+	
+	
+    
 	
 	if (car->_collision != 0){
 		has_col = true;
