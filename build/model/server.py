@@ -85,23 +85,17 @@ def dump(filename="Untitled", data=None):
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def drive_car(action, reset):
+def drive_car(action, reset, _break=0, gear=1, clutch=0):
     f = open("instructions.ini", "w")
-    _action = action - 1
-    f.write("[steer]\naccel={}\nsteer={}\nrestart={}\n".format(speed, _action, reset))
-    f.write("[steer]\n")
-    f.write("accel={}\n".format(speed))
-    f.write("steer={}\n".format(_action))
-    f.write("restart={}\n".format(reset))
+    f.write("[steer]\n"
+            "accel={}\n"
+            "steer={}\n"
+            "brake={}\n"
+            "gear={}\n"
+            "clutch={}\n"
+            "restart={}\n"
+            .format(speed, action-1, _break, gear, clutch, reset))
     f.close()
-
-    # with open('instructions.ini', mode='w') as file:
-    #     writer = csv.writer(file)
-    #     _action = action - 1
-    #     writer.writerow("[steer]")
-    #     writer.writerow("accel={}".format(speed))
-    #     writer.writerow("steer={}".format(_action))
-    #     writer.writerow("restart={}".format(reset))
 
 
 def main():
@@ -125,9 +119,7 @@ def step(action):
 1
 
 def reset():
-    f = open("instructions.ini", "w")
-    f.write("[steer]\naccel={}\nsteer={}\nrestart={}\n".format(speed, 0, 1))
-    f.close()
+    drive_car(0, 1)
 
     img, reward, collision = recieve_data(0, 0)
     return (img)

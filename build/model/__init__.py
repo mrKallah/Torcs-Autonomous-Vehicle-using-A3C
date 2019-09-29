@@ -7,7 +7,7 @@ betas = (0.9, 0.999) # betas (Tuple[float, float], optional): coefficients used 
 
 
 UPDATE_GLOBAL_ITER = 5
-MAX_EP = 3000
+MAX_EP = 300
 MAX_EP_STEP = 200
 
 
