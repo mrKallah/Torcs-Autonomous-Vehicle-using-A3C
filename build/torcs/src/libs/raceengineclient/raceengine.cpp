@@ -746,11 +746,7 @@ ReUpdate(void)
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         glReadBuffer(GL_FRONT);
         glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
-		
-		//here the status of the vehicle is printed. 
-		std::cout << "_collision = " << s->cars[0]->_collision << "\t_reward = " << s->cars[0]->_reward << "\t_askRestart = " << s->cars[0]->_askRestart << std::endl;
-
-		
+				
 		//restaring the race if the model requests it 
 		if (s->cars[0]->_askRestart){
 			ReRaceCleanup();
