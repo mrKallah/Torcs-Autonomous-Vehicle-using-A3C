@@ -25,6 +25,7 @@ This project should be considered as a proof of concept.
 - [x] [Kallah] change the driver instructions to be a ini file rather than a csv file for more readable code, avoid duplicate code and to make the driver instructions more readable. 
 - [x] [Kallah] rename the resize_img function in the exporter class to reshape_img, as it reshapes, it does not resize. 
 - [x] [Kallah] find and get rid of unused methods in the exporter class. 
+- [ ] Remove using namespace std in c++ files to remove bad C++ practices. 
 
 ### Python
 - [ ] Tune the parameters for model and tried to make the model consistently learn. 
