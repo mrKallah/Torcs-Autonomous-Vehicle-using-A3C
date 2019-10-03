@@ -17,10 +17,10 @@ This project should be considered as a proof of concept.
   - [x] [Kallah] inireader.cpp/h
   - [x] [Kallah] car.h
 - [x] [Kallah] Decrease the latency in torcs (we implemented a latency on sending the images, dont remember why)
-- [ ] [Kallah] Remove default torcs files from the folder directory //(I've started this, but its harder than one would think, file x and y may have the same content but different dates etc, and so the python script I wrote to automatically get rid of anything that was unedited from the default torcs directory was not good enough as it does not ignore that kind of stuff).
+- [ ] [Kallah] Remove default torcs files from the github //(I've started this, but its harder than one would think, file x and y may have the same content but different dates etc, and so the python script I wrote to automatically get rid of anything that was unedited from the default torcs directory was not good enough as it does not ignore that kind of stuff).
 - [x] [Kallah] Allow for change of gears, clutch and brakes and add option to ini parameter
 - [x] [Kallah] Solve memory issue in torcs exporter class. SOLUTION: memory leak due to bad memalloc() with non-sane free() methodology. 
-- [ ] [Kallah] Allow for multiple torcs clients running by having a port number file increment, I.E. client 1 reads port 200, writes port 201 which the next client uses and so on. 
+- [x] [Kallah] Allow for multiple torcs clients running by having a port number file increment, I.E. client 1 reads port 200, writes port 201 which the next client uses and so on. 
 - [ ] look into restart memory leak which is apparently inherrent to TORCS itself. each reload uses approx 100-200mb of ram
 - [x] [Kallah] change the driver instructions to be a ini file rather than a csv file for more readable code, avoid duplicate code and to make the driver instructions more readable. 
 - [x] [Kallah] rename the resize_img function in the exporter class to reshape_img, as it reshapes, it does not resize. 
