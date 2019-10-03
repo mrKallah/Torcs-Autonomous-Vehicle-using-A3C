@@ -50,8 +50,8 @@ def send_msg(s):
     check_exit(d)
 
 
-def recv_img():
-    PORT = 4321  # int(input('Assign port num:  '))
+def recv_img(PORT):
+    # PORT = 4321  # int(input('Assign port num:  '))
     s, conn, addr = connect(PORT)
     with conn:
         img = recv_msg(conn, addr, PORT)
@@ -77,10 +77,10 @@ def format_img(img):
     return img
 
 
-import pickle
 
 
 def dump(filename="Untitled", data=None):
+    import pickle
     with open(filename + '.pickle', 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -100,7 +100,8 @@ def drive_car(action, reset, _break=0, gear=1, clutch=0):
 
 def main():
     while True:
-        img = recv_img()
+        PORT = 50
+        img = recv_img(PORT)
         if img is not None:
             reward = int(img[0]) - 1
             collision = int(img[1])
@@ -113,21 +114,21 @@ if __name__ == '__main__':
     main()
 
 
-def step(action):
-    img, reward, collision = recieve_data(action, 0)
+def step(action, PORT):
+    img, reward, collision = recieve_data(action, 0, PORT)
     return (img, reward, collision)
 1
 
-def reset():
+def reset(PORT):
     drive_car(0, 1)
 
-    img, reward, collision = recieve_data(0, 0)
+    img, reward, collision = recieve_data(0, 0, PORT)
     return (img)
 
-def recieve_data(action, reset):
+def recieve_data(action, reset, PORT):
     img = None
     while img.__class__ == None.__class__:
-        img = recv_img()
+        img = recv_img(PORT)
 
     if img is not None:
         # reward = (float(img[0]) / 100)

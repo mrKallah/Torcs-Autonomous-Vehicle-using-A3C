@@ -8,6 +8,7 @@ import torchvision.models as models
 import torch
 from torch import manual_seed
 import os
+import time
 
 
 
@@ -118,10 +119,28 @@ class Worker(mp.Process):
         # local network
         self.lnet = Net(N_S, N_A)
 
+        f = open("ports.txt", "r")
+        contents = f.read()
+
+        self.ip, self.port = contents.split(" ")
+        self.port = int(self.port)
+
+        import subprocess
+
+
+        subprocess.Popen(("konsole", "-e", "torcs", "--noclose"))
+        # Wait for 300 milliseconds so torcs can increment the port
+        time.sleep(.300)
+        #output, error = self.sp.communicate()
+
+
+        #os.system('torcs')
+
+
     def run(self):
         total_step = 1
         while self.g_ep.value < MAX_EP:
-            s = reset()
+            s = reset(self.port)
             #print("img_array", s)
             s = feature_vec(s)
 
@@ -130,7 +149,7 @@ class Worker(mp.Process):
             ep_r = 0.0
             while True:
                 a = self.lnet.choose_action(s)
-                s_, r, done = step(a)
+                s_, r, done = step(a, self.port)
                 s_ = feature_vec(s)
 
 
@@ -185,7 +204,7 @@ if __name__ == "__main__":
     opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.), mp.Queue())
     worker_amount = mp.cpu_count()
-    worker_amount = 1
+    worker_amount = 2
 
     # parallel training
     workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(worker_amount)]
