@@ -34,7 +34,7 @@ Restarting is also done from this class.
 
 ### src/libs/raceengineclient/raceengine.cpp 
 This is the main engine for racing. Only some (maybe one) method(s) within this file has been changed. 
-The primary method that has been changed is the ReUpdate method. In this method the image is extracted from the video buffer and extracted as a unsigned char array. This array is then fed to the exporter class which is the server class for this project. The portnumber and ip address is set within this class. 
+The primary method that has been changed is the ReUpdate method. In this method the image is extracted from the video buffer and extracted as a unsigned char array. This array is then fed to the exporter class which is the server class for this project. 
 
 ### src/libs/raceengineclient/exporter.cpp
 This is the server that handles the sending of the image from the c++ environment to the python environment. This also contains a reshaping method (incorrectly named as resize_img). This reshapes the image from one shape to another. Its unclear as to what the original shape was however the new shape is a rgb image where each channel contains the pixel values for one color. 
@@ -44,3 +44,9 @@ This is the functions that handles the reading of the ini files. This might not 
 
 ### src/interfaces/car.h
 This is where global car variables are handeled. If you want to be able to see a value for a car in the race engine, you would have to define a variable 'xyz' in car.h and in the ce903.cpp use car->xyz=123 and in the raceengine.cpp use s->cars[0]->xyz to read that variables value. 
+
+### src/libs/client/mainmenu.cpp
+This is the splash screen of the torcs game. This is where the ports are handled for the c++ side of things. When a client is opened, it reads the ~/tesla/ports.txt and then increments the port in that file by one. This ensures the next client starts with a different port. If the ports are busy, the ports file can be changed to the lower number of a range of ports. 
+
+### src/libs/client/rw.cpp
+This program handles the writing and reading from and to the ~/tesla/port.txt file for the main menu. 
