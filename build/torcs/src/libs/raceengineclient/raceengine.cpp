@@ -35,6 +35,10 @@
 #include <iostream>
 #include <fstream>
 #include <typeinfo>
+#include <string>
+#include <thread>
+#include <sstream>
+
 
 #include "racemain.h"
 #include "racegl.h"
@@ -45,6 +49,7 @@
 
 #include "raceengine.h"
 
+using std::string;
 
 static double	msgDisp;
 static double	bigMsgDisp;
@@ -763,11 +768,55 @@ ReUpdate(void)
 		// current img is free'd within this function and a updated malloc is returned. 
         img = exporter.reshape(col, rew, img);
 		
+		// getting thread ID which is used to allocate ports and ips.
+		std::stringstream ss;
+		ss << std::this_thread::get_id();
+		string thread_id = ss.str();
 		
+		// the ports are handled in src/libs/client/mainmenu.cpp
+		// system variable manipulation
+		// getting the variable name by appending a to start and end of thread id
+		string variable = "a" + thread_id + "a";
+		
+		// converting variable name from string to c string
+		char var[variable.length() + 1];
+		strcpy(var, variable.c_str());
+	
+		// reading environment variable using variable name
+		const char* sysvar = getenv(var);
+		string varsys = "";
+		
+		//quitting if enironemnt variable does not contain ip and ports
+		if (sysvar == NULL) {
+			std::cout << "Environment variable 'sysvar' is NULL" << std::endl;
+			sysvar = "NULL";
+			exit(-1);
+		}
+		
+		// separate port and ip using : as delimiter
+		string l = "";
+		string r = "";
+		bool found = false;
+		for (unsigned int i = 0; i < (unsigned)strlen(sysvar); i++){
+			if (sysvar[i] == ':'){
+				found = true;
+			} else if (found){
+				l = l + sysvar[i];
+			} else {
+				r = r + sysvar[i];
+			}
+		}
+		
+		//convert port to int
+		int port = stoi(l);
+			
+		//convert ip to c string
+		char ip[r.length() + 1];
+		strcpy(ip, r.c_str());
 		
 		// here the image is exported from this program to the model in Python
         //exporter.save_to_file();
-        exporter.create_client("0.0.0.0", 4321);	//CHANGE PORT NUMBER
+        exporter.create_client(ip, port);	//CHANGE PORT NUMBER
         bool connected = exporter.svr_connect();
         if (connected) {
             exporter.send_msg(img);
