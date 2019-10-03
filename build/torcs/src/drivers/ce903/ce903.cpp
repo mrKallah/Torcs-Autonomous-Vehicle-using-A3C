@@ -19,6 +19,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include <tgf.h> 
 #include <track.h> 
@@ -26,7 +27,12 @@
 #include <raceman.h> 
 #include <robottools.h>
 #include <robot.h>
+
+
+
 #include "ini_reader.h"
+
+
 
 
 using namespace std;
@@ -107,7 +113,7 @@ static void newrace(int index, tCarElt* car, tSituation *s) {
     
 } 
 
-bool has_col = false;
+
 /*	Drive during race. 
 	This method reads the instruction file to know what actions to perform. 
 	It then uses those instructions to change the output of the vehicle.
@@ -175,27 +181,47 @@ static void drive(int index, tCarElt* car, tSituation *s) {
     car->_brakeCmd = brake;
     car->_gearCmd = gear;
 	
+	// getting the thread id
+	std::stringstream ss;
+	ss << std::this_thread::get_id();
+	string thread_id = ss.str();
 	
-    //here the status of the vehicle is printed. 
+	//system variable manipulation
+	// using the thread id to get ports and ip from environment variable 
+	string variable = "a" + thread_id + "a";
+	
+	// convert string to c string
+	char var[variable.length() + 1];
+	strcpy(var, variable.c_str());
+	
+	// get environment variable
+	const char* sysvar = getenv(var);
+	string varsys = "";
+	
+	// quit if environment variable is empty
+	if (sysvar == NULL) {
+		cout << "Environment variable sysvar is NULL" << endl;
+		sysvar = "NULL";
+		exit(-1);
+	}
+
+	
+    //here the status of the vehicle and program is printed. 
     cout	<< "collision = " << car->_collision 
-			<< "\n" << "reward = " << car->_reward
-			<< "\n" << "restart = " << car->_askRestart
-			<< "\n" << "steer = " << car->_steerCmd
-			<< "\n" << "speed = " << car->_accelCmd
-			<< "\n" << "clutch = " << car->_clutchCmd
-			<< "\n" << "brake = " << car->_brakeCmd
-			<< "\n" << "gear = " << car->_gearCmd 
+			<< "\n" << "Reward = " << car->_reward
+			<< "\n" << "Restart = " << car->_askRestart
+			<< "\n" << "Steer = " << car->_steerCmd
+			<< "\n" << "Speed = " << car->_accelCmd
+			<< "\n" << "Clutch = " << car->_clutchCmd
+			<< "\n" << "Brake = " << car->_brakeCmd
+			<< "\n" << "Gear = " << car->_gearCmd 
+			<< "\n" << "Thread ID = " << std::this_thread::get_id()
+			<< "\n" << "Sysvar = " << sysvar
 			<< endl;
 	cout << "###################################" << endl;
 	
-	
-    
-	
+	// checks if 
 	if (car->_collision != 0){
-		has_col = true;
-	}
-	
-	if (has_col == true) {
 		car->_collision = 1;
 	}
 }
@@ -211,5 +237,4 @@ static void
 shutdown(int index)
 {
 }
-
 

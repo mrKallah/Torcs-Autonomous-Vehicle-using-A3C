@@ -2,7 +2,7 @@ ROBOT       = ce903
 MODULE      = ${ROBOT}.so
 MODULEDIR   = drivers/${ROBOT}
 SOURCES     = ${ROBOT}.cpp
-SOURCES   = ${ROBOT}.cpp ini_reader.cpp
+SOURCES   = ${ROBOT}.cpp ini_reader.cpp 
 
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml car1-stock2.rgb logo.rgb
