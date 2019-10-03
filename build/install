@@ -1,5 +1,7 @@
 # Install dependancies using 
 
+sudo apt-get install konsole
+
 pip install Pillow torch numpy matplotlib gym opencv-python 
 
 # Use the torcs_install file for instructions on how to install torcs
