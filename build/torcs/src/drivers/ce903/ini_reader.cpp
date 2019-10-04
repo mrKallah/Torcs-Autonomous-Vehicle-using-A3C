@@ -183,7 +183,7 @@ vector <vector<string>> readConfigFile(string & inifile){
 void find_var(string inifile, string type, string variable, string &value){
 	bool found = false;
 	int tries = 0;
-	
+	bool printed = false;
 	
 	while (!found) {
 		//type = '[' + type + ']';
@@ -205,15 +205,12 @@ void find_var(string inifile, string type, string variable, string &value){
 			}
 		}
 
-		if (!found && tries > 100){
-			cout << "could not find the " << type << ", " << variable << " parameter from " << inifile << endl;
-			cout << "tried a total of " << tries << " times" << endl;
-			cout << "ini trace below:" << endl;
-			for (int i = 0; i < types.size(); i++){
-				cout << "types[" << i << "] = " << types[i] <<  " | variables[" << i << "] = " << variables[i] <<  " | values[" << i << "] = " << values[i] << endl; 	
+		if (!found && tries > 10000){
+			if (!printed){
+				cout << "could not find the " << type << ", " << variable << " parameter from " << inifile << endl;
+				cout << "tried a total of " << tries << " times" << endl;
+				cout << "use control + c to end the loop" << endl;
 			}
-			cout << "trace end" << endl;
-			exit(-1);
 		}
 		tries += 1;
 	}
