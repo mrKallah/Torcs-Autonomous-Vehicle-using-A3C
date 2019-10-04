@@ -2,19 +2,16 @@ import socket
 from util import check_exit, encrypt, decrypt
 import ctypes
 import numpy as np
-import matplotlib.pyplot as plt
-import sys
-import csv
 from pro import process
 from video_frame import update
-
+import cv2
 _connected = False
 
-def connect(PORT):
+def connect(PORT, name):
 
     global _connected
     if not _connected:
-        update([[0]])
+        update([[0]], name)
         print("Waiting for connection....")
 
     HOST = ""
@@ -50,9 +47,9 @@ def send_msg(s):
     check_exit(d)
 
 
-def recv_img(PORT):
+def recv_img(PORT, name):
     # PORT = 4321  # int(input('Assign port num:  '))
-    s, conn, addr = connect(PORT)
+    s, conn, addr = connect(PORT, name)
     with conn:
         img = recv_msg(conn, addr, PORT)
         # print(img)
@@ -69,9 +66,15 @@ def format_img(img):
             row.append([img[i, j * 3], img[i, j * 3 + 1], img[i, j * 3 + 2]])
         RGB.append(row)
 
-    np.asarray(RGB)
+
+
+
     RGB = np.flip(RGB, 0)
     img = process(RGB)  # <- pre-processed images here
+
+    #img = lambda img : np.dot(img[... , :3] , [0.299 , 0.587, 0.114])
+
+
     # plt.imshow(img)
     # plt.show()
     return img
@@ -101,7 +104,7 @@ def drive_car(action, reset, _break=0, gear=1, clutch=0):
 def main():
     while True:
         PORT = 50
-        img = recv_img(PORT)
+        img = recv_img(PORT, "server main")
         if img is not None:
             reward = int(img[0]) - 1
             collision = int(img[1])
@@ -114,21 +117,21 @@ if __name__ == '__main__':
     main()
 
 
-def step(action, PORT):
-    img, reward, collision = recieve_data(action, 0, PORT)
+def step(action, PORT, name):
+    img, reward, collision = recieve_data(action, 0, PORT, name)
     return (img, reward, collision)
 1
 
-def reset(PORT):
+def reset(PORT, name):
     drive_car(0, 1)
 
-    img, reward, collision = recieve_data(0, 0, PORT)
+    img, reward, collision = recieve_data(0, 0, PORT, name)
     return (img)
 
-def recieve_data(action, reset, PORT):
+def recieve_data(action, reset, PORT, name):
     img = None
     while img.__class__ == None.__class__:
-        img = recv_img(PORT)
+        img = recv_img(PORT, name)
 
     if img is not None:
         # reward = (float(img[0]) / 100)
@@ -153,7 +156,7 @@ def recieve_data(action, reset, PORT):
 
         img = format_img(img)
         drive_car(action, reset)
-        update(img)
+        update(img, name)
     else:
         raise ValueError("No image was received")
 

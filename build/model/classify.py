@@ -128,7 +128,9 @@ class Worker(mp.Process):
         import subprocess
 
 
-        subprocess.Popen(("konsole", "-e", "torcs", "--noclose"))
+        subprocess.Popen(("konsole", "--noclose", "-e", "torcs"))
+
+
         # Wait for 300 milliseconds so torcs can increment the port
         time.sleep(.300)
         #output, error = self.sp.communicate()
@@ -140,7 +142,7 @@ class Worker(mp.Process):
     def run(self):
         total_step = 1
         while self.g_ep.value < MAX_EP:
-            s = reset(self.port)
+            s = reset(self.port, "{}{}".format(self.ip, self.port))
             #print("img_array", s)
             s = feature_vec(s)
 
@@ -149,11 +151,11 @@ class Worker(mp.Process):
             ep_r = 0.0
             while True:
                 a = self.lnet.choose_action(s)
-                s_, r, done = step(a, self.port)
+                s_, r, done = step(a, self.port, "{}{}".format(self.ip, self.port))
                 s_ = feature_vec(s)
 
 
-                print("action = {}, reward = {}, episode reward = {}, restart = {}".format(a-1, round(r, 2), round(ep_r, 2), done))
+                print("{}, action = {}, reward = {}, episode reward = {}, restart = {}".format(self.name, a-1, round(r, 2), round(ep_r, 2), done))
 
                 ep_r += r
                 buffer_a.append(a)
@@ -203,7 +205,7 @@ if __name__ == "__main__":
     gnet.share_memory()
     opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.), mp.Queue())
-    worker_amount = mp.cpu_count()
+    #worker_amount = mp.cpu_count()
     worker_amount = 2
 
     # parallel training
