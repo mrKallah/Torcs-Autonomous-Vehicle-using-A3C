@@ -74,27 +74,6 @@ int TorcsMainMenuInit(void) {
 				    NULL, (tfuiCallback)NULL, 
 				    1);
 
-    GfuiScreenAddBgImg(menuHandle, "data/img/splash-main.png");
-	
-	GfuiTitleCreate(menuHandle, "TORCS", 0);
-
-    GfuiLabelCreate(menuHandle, "The Open Racing Car Simulator", GFUI_FONT_LARGE, 320, 420, GFUI_ALIGN_HC_VB, 0);
-
-    GfuiMenuButtonCreate(menuHandle, "Race", "Races Menu", ReSinglePlayerInit(menuHandle), GfuiScreenActivate);
-	
-    GfuiMenuButtonCreate(menuHandle, "Configure Players", "Players configuration menu", TorcsDriverMenuInit(menuHandle), GfuiScreenActivate);
-
-    GfuiMenuButtonCreate(menuHandle, "Options", "Configure", TorcsOptionOptionInit(menuHandle), GfuiScreenActivate);
-    
-    GfuiMenuDefaultKeysAdd(menuHandle);
-
-    GfuiMenuBackQuitButtonCreate(menuHandle, "Quit", "Quit TORCS", TorcsMainExitMenuInit(menuHandle), GfuiScreenActivate);
-
-	
-	
-	
-	
-	
 	string file = HOME + "/tesla/ports.txt";
 	
 	string ip;
@@ -121,9 +100,28 @@ int TorcsMainMenuInit(void) {
 	strcpy(val, value.c_str());
 	
 	setenv(var, val, 1);
-
 	
-	cout << "####### end ############" << endl;
+	
+	cout << val << endl;
+	
+	
+    GfuiScreenAddBgImg(menuHandle, "data/img/splash-main.png");
+	
+	GfuiTitleCreate(menuHandle, "TORCS", 0);
+
+    GfuiLabelCreate(menuHandle, val, GFUI_FONT_LARGE, 320, 420, GFUI_ALIGN_HC_VB, 0);
+
+    GfuiMenuButtonCreate(menuHandle, "Race", "Races Menu", ReSinglePlayerInit(menuHandle), GfuiScreenActivate);
+	
+    GfuiMenuButtonCreate(menuHandle, "Configure Players", "Players configuration menu", TorcsDriverMenuInit(menuHandle), GfuiScreenActivate);
+
+    GfuiMenuButtonCreate(menuHandle, "Options", "Configure", TorcsOptionOptionInit(menuHandle), GfuiScreenActivate);
+    
+    GfuiMenuDefaultKeysAdd(menuHandle);
+
+    GfuiMenuBackQuitButtonCreate(menuHandle, "Quit", "Quit TORCS", TorcsMainExitMenuInit(menuHandle), GfuiScreenActivate);
+
+
 	
     return 0;
 }
