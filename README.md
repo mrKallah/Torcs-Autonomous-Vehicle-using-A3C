@@ -45,8 +45,8 @@ The image above is a link to a video that shows the latest example of the model 
 - [ ] Change to regression rather than classification for steering, maybe add accel too. (should be controlled by .ini param)
 - [ ] Allow for change of gears, clutch and brakes to be controlled by A3C, on/off by parameters
 - [ ] make the pre-processing image into a boolean image. This could help the model avoid local optima, would be similar to semantic segmentation as seen in https://arxiv.org/pdf/1801.05299.pdf, however without the sementics as onyl the road is maintained in the image fed to the model. 
-- [ ] [Kallah] Move to grayscale images for faster classification and image handling
-- [ ] [Kallah] Rework preprocessing to increase performance
+- [x] [Kallah] Move to grayscale images for faster image pre-processing
+- [x] [Kallah] Rework preprocessing to increase performance
 
 ### Other
 - [ ] Detailed instructions for install
