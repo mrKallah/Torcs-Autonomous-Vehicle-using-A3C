@@ -13,5 +13,7 @@ MAX_EP_STEP = 200
 
 
 
-
+greyscale = True
+height = 224
+width = 224
 

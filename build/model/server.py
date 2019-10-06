@@ -5,13 +5,19 @@ import numpy as np
 from pro import process
 from video_frame import update
 import cv2
+import time
+import matplotlib.pyplot as plt
+
+from __init__ import height
+from __init__ import width
+
 _connected = False
 
-def connect(PORT, name):
+def connect(PORT, name, greyscale):
 
     global _connected
     if not _connected:
-        update([[0]], name)
+        update([[0]], name, greyscale)
         print("Waiting for connection....")
 
     HOST = ""
@@ -47,9 +53,9 @@ def send_msg(s):
     check_exit(d)
 
 
-def recv_img(PORT, name):
+def recv_img(PORT, name, greyscale):
     # PORT = 4321  # int(input('Assign port num:  '))
-    s, conn, addr = connect(PORT, name)
+    s, conn, addr = connect(PORT, name, greyscale)
     with conn:
         img = recv_msg(conn, addr, PORT)
         # print(img)
@@ -57,26 +63,45 @@ def recv_img(PORT, name):
     return img
 
 
-def format_img(img):
+def format_img(img, greyscale):
+
+
     img = img.reshape(240, 960)
+
+    # convert from having one red column, one green column and then one blue column
+    # to one red pixel, one green pixel and one blue pixel
+    # (I think)
     RGB = []
     for i in range(0, 240):
         row = []
         for j in range(0, 320):
             row.append([img[i, j * 3], img[i, j * 3 + 1], img[i, j * 3 + 2]])
         RGB.append(row)
+    img = RGB
+
+    # convert image to np array of type float32. Div by 255 as
+    img = np.asarray(img).astype(np.float32)/255
+
+    # resizes the image to the hight and width the model requires
+    img = cv2.resize(img, (height, width))
+
+    # image comes in with top at bottom and bottom at top
+    img = np.flip(img, 0)
+
+    # convert to greyscale
+    if greyscale:
+        img = np.dot(img[..., :3], [0.299, 0.587, 0.114])
+
+    # preprocessing the image
+    img = process(img, greyscale, height, width)  # <- pre-processed images here
 
 
 
+    if greyscale:
+        img = np.stack((img,)*3, axis=-1) # converting greyscale back to rgb
+    else:
+        img = np.asarray(img)
 
-    RGB = np.flip(RGB, 0)
-    img = process(RGB)  # <- pre-processed images here
-
-    #img = lambda img : np.dot(img[... , :3] , [0.299 , 0.587, 0.114])
-
-
-    # plt.imshow(img)
-    # plt.show()
     return img
 
 
@@ -104,12 +129,12 @@ def drive_car(action, reset, _break=0, gear=1, clutch=0):
 def main():
     while True:
         PORT = 50
-        img = recv_img(PORT, "server main")
+        img = recv_img(PORT, "server main", False)
         if img is not None:
             reward = int(img[0]) - 1
             collision = int(img[1])
             # print("col = {} && rew = {}".format(collision, reward))
-            img = format_img(img)
+            img = format_img(img, False)
             drive_car(0, 0)
 
 
@@ -117,21 +142,21 @@ if __name__ == '__main__':
     main()
 
 
-def step(action, PORT, name):
-    img, reward, collision = recieve_data(action, 0, PORT, name)
+def step(action, PORT, name, greyscale):
+    img, reward, collision = recieve_data(action, 0, PORT, name, greyscale)
     return (img, reward, collision)
 1
 
-def reset(PORT, name):
+def reset(PORT, name, greyscale):
     drive_car(0, 1)
 
-    img, reward, collision = recieve_data(0, 0, PORT, name)
+    img, reward, collision = recieve_data(0, 0, PORT, name, greyscale)
     return (img)
 
-def recieve_data(action, reset, PORT, name):
+def recieve_data(action, reset, PORT, name, greyscale):
     img = None
     while img.__class__ == None.__class__:
-        img = recv_img(PORT, name)
+        img = recv_img(PORT, name, greyscale)
 
     if img is not None:
         # reward = (float(img[0]) / 100)
@@ -154,9 +179,10 @@ def recieve_data(action, reset, PORT, name):
         img[0] = 0
         img[1] = 0
 
-        img = format_img(img)
+        img = format_img(img, greyscale)
+
         drive_car(action, reset)
-        update(img, name)
+        update(img, name, greyscale)
     else:
         raise ValueError("No image was received")
 

@@ -1,6 +1,9 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import time
+
+
 
 
 def plot_image(image, name="", plt_show=True):
@@ -88,14 +91,12 @@ def rm_green(img, height, width, r_threshold=80, g_threshold=90, b_threshold=80)
             else:
                 # if the pixel is within the threshold boundary then set found to true and
                 # change the pixel at that point to be white
-                if green[verti][hori][0] < r_threshold:
-                    if green[verti][hori][1] > g_threshold:
-                        if green[verti][hori][2] < b_threshold:
-                            found = True
-                            green[verti][hori] = 255
-                            if verti < bottom:
-                                bottom = verti
-    return green, bottom
+                if (green[verti][hori][0] < r_threshold) and (green[verti][hori][1] > g_threshold) and (green[verti][hori][2] < b_threshold):
+                    found = True
+                    green[verti][hori] = 255
+                    if verti < bottom:
+                        bottom = verti
+    return green
 
 
 def rm_line(img, height, width):
@@ -118,33 +119,51 @@ def rm_line(img, height, width):
     return line
 
 
-def process(img):
+def process(img, greyscale, height, width):
     # set height and width
 
-    # convert to float32 for cv2
-    img = img.astype(np.float32)
 
-    img = cv2.resize(img, (200, 200))
+    strength = 150
+    full_time = time.time()
 
-    height = img.shape[0]
-    width = img.shape[1]
 
-    strength = 50
 
-    img[np.where((img < [strength, strength, strength]).all(axis=2))] = [0, 255, 0]
+    if greyscale:
+        start_time = time.time()
+        # img[np.where((img < [strength]).all())] = [255]
+        # img[np.where((img < [strength]).all(axis=0))] = [255]
+        # img[np.where((img < [strength]).all(axis=1))] = [255]
+        # img[np.where((img < [strength]).all(axis=2))] = [255]
+    else:
+        start_time = time.time()
+        img[np.where((img < [strength, strength, strength]).all(axis=2))] = [0, 255, 0]
+
 
     # create blur kernel
+    start_time = time.time()
     blur_size = 5
     kernel = np.ones((blur_size, blur_size), np.float32) / (blur_size * blur_size)
 
+
     # blur image (Only use blur if needed. Lower resolution need less blur. Changing kernel can help too.)
+    start_time = time.time()
     img = cv2.filter2D(img, -1, kernel)
 
-    # removes the green top of the image
-    img, top = rm_green(img, height, width)  # slow (cpp) = 0.148861885
+
+    if greyscale:
+        # removes the green top of the image
+        start_time = time.time()
+        img = rm_green_bw(img, height, width)  # slow (cpp) = 0.148861885
+    else:
+        # removes the green top of the image
+        start_time = time.time()
+        img = rm_green(img, height, width)  # slow (cpp) = 0.148861885
+
+
 
     # convert back to int
-    img = img.astype(np.int)
+    start_time = time.time()
+
 
     # print(end-start)
     ########
@@ -155,6 +174,22 @@ def process(img):
 
     return img
 
+
+def rm_green_bw(img, height, width, threshold=0.28):
+
+    # go through from side to side
+    for w in range(0, width):
+        found = False
+        # go though from bottom to top
+        for h in range(0, height):
+            h = height - h - 1
+
+            # if image pixel is darker than threshold then remove all pixels above
+            if img[h][w] <= threshold:
+                found = True
+            if found:
+                img[h][w] = 1
+    return img
 
 def plot_process(imgs):
     names = []

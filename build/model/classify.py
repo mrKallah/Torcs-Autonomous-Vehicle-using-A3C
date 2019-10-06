@@ -13,7 +13,7 @@ import time
 
 
 from server import step, reset
-from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate, eps, betas
+from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate, eps, betas, greyscale, height, width
 from utils import set_init, push_and_pull, record
 
 
@@ -28,15 +28,46 @@ is_cuda = False
 manual_seed(0)
 
 # densenet121
-model = models.vgg16(pretrained=True)
 
-if is_cuda:
-    model = model.cuda()
+
+
+
+
+
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
 N_S = 25088
 N_A = 3
+
+
+if greyscale:
+    shape = (height, width, 1)  # (height, width, 3)
+    _shape = (1, height, width)  # (3, height, width)
+else:
+    shape = (height, width, 3) # (height, width, 3)
+    _shape = (3, height, width) # (3, height, width)
+
+
+shape = (height, width, 3) # (height, width, 3)
+_shape = (3, height, width) # (3, height, width)
+
+
+if greyscale:
+    # model = models.resnet50(pretrained=False)
+    # model.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+
+    model = models.vgg19(pretrained=False)
+
+
+else:
+    model = models.vgg16(pretrained=True)
+
+
+
+if is_cuda:
+    model = model.cuda()
+
 
 
 class SharedAdam(torch.optim.Adam):
@@ -76,8 +107,8 @@ class Net(nn.Module):
             if np.max(x) > 1:
                 x = np.asarray(x, np.float32)
                 x = x * 1 / 255
-                x = np.resize(x, (224, 224, 3))
-                x = np.reshape(x, (3, 224, 224))
+                x = np.resize(x, shape)
+                x = np.reshape(x, _shape)
             x = torch.from_numpy(x)
 
         pi1 = F.relu6(self.pi1(x))
@@ -142,7 +173,7 @@ class Worker(mp.Process):
     def run(self):
         total_step = 1
         while self.g_ep.value < MAX_EP:
-            s = reset(self.port, "{}{}".format(self.ip, self.port))
+            s = reset(self.port, "{}{}".format(self.ip, self.port), greyscale)
             #print("img_array", s)
             s = feature_vec(s)
 
@@ -150,12 +181,25 @@ class Worker(mp.Process):
             buffer_s, buffer_a, buffer_r = [], [], []
             ep_r = 0.0
             while True:
+
                 a = self.lnet.choose_action(s)
-                s_, r, done = step(a, self.port, "{}{}".format(self.ip, self.port))
+
+
+
+
+                s_, r, done = step(a, self.port, "{}{}".format(self.ip, self.port), greyscale)
+
+
+
                 s_ = feature_vec(s)
 
 
+
                 print("{}, action = {}, reward = {}, episode reward = {}, restart = {}".format(self.name, a-1, round(r, 2), round(ep_r, 2), done))
+
+
+
+
 
                 ep_r += r
                 buffer_a.append(a)
@@ -174,6 +218,8 @@ class Worker(mp.Process):
                         break
                 s = s_
                 total_step += 1
+
+
         self.res_queue.put(None)
 
 
@@ -182,8 +228,8 @@ def feature_vec(img):
     if img.__class__ != np.asarray([]).__class__:
         return img
     img = np.asarray(img, np.float32)
-    img = np.resize(img, (224, 224, 3))
-    img = np.reshape(img, (3, 224, 224))
+    img = np.resize(img, shape)
+    img = np.reshape(img, _shape)
     img = img * 1 / 255
     img_tensor = torch.from_numpy(img)
     img_tensor = img_tensor.unsqueeze_(0)
