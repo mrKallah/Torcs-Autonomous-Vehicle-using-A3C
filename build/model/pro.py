@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-
-
+blur_size = 5
+kernel = np.ones((blur_size, blur_size), np.float32) / (blur_size * blur_size)
 
 def plot_image(image, name="", plt_show=True):
     '''
@@ -42,7 +42,7 @@ def plot_image(image, name="", plt_show=True):
         plt.show()
 
 
-def rm_green(img, height, width, r_threshold=80, g_threshold=90, b_threshold=80):
+def rm_green(img, height, width, r_threshold=0.1, g_threshold=0.1, b_threshold=0.1):
     """
 	Makes the any pixel within a color range white and any pixel above that pixel white.
 	Can be used for removing redundant information if you have a color boundary.
@@ -87,13 +87,13 @@ def rm_green(img, height, width, r_threshold=80, g_threshold=90, b_threshold=80)
 
             # if a pixel within the threshold boundary has been found, then make the whole column white above said pixel
             if found:
-                green[verti][hori] = 255
+                green[verti][hori] = 1
             else:
                 # if the pixel is within the threshold boundary then set found to true and
                 # change the pixel at that point to be white
                 if (green[verti][hori][0] < r_threshold) and (green[verti][hori][1] > g_threshold) and (green[verti][hori][2] < b_threshold):
                     found = True
-                    green[verti][hori] = 255
+                    green[verti][hori] = 1
                     if verti < bottom:
                         bottom = verti
     return green
@@ -120,57 +120,19 @@ def rm_line(img, height, width):
 
 
 def process(img, greyscale, height, width):
+
     # set height and width
+    strength = 0.2
 
-
-    strength = 150
-    full_time = time.time()
-
-
-
-    if greyscale:
-        start_time = time.time()
-        # img[np.where((img < [strength]).all())] = [255]
-        # img[np.where((img < [strength]).all(axis=0))] = [255]
-        # img[np.where((img < [strength]).all(axis=1))] = [255]
-        # img[np.where((img < [strength]).all(axis=2))] = [255]
-    else:
-        start_time = time.time()
-        img[np.where((img < [strength, strength, strength]).all(axis=2))] = [0, 255, 0]
-
-
-    # create blur kernel
-    start_time = time.time()
-    blur_size = 5
-    kernel = np.ones((blur_size, blur_size), np.float32) / (blur_size * blur_size)
-
-
-    # blur image (Only use blur if needed. Lower resolution need less blur. Changing kernel can help too.)
-    start_time = time.time()
-    img = cv2.filter2D(img, -1, kernel)
-
+    if not greyscale:
+        img[np.where((img < [strength, strength, strength]).all(axis=2))] = [0, 1, 0]
 
     if greyscale:
         # removes the green top of the image
-        start_time = time.time()
-        img = rm_green_bw(img, height, width)  # slow (cpp) = 0.148861885
+        img = rm_green_bw(img, height, width)
     else:
         # removes the green top of the image
-        start_time = time.time()
-        img = rm_green(img, height, width)  # slow (cpp) = 0.148861885
-
-
-
-    # convert back to int
-    start_time = time.time()
-
-
-    # print(end-start)
-    ########
-    # optimization notes:
-    # numbers are the best of 3 attempts
-    # optimized for 200x200 0.432s -> 0.314s -> 0.156s -> 0.147s -> 0.136s -> 0.132s -> 0.118
-    ########
+        img = rm_green(img, height, width)
 
     return img
 

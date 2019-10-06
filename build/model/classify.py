@@ -9,7 +9,9 @@ import torch
 from torch import manual_seed
 import os
 import time
-
+import subprocess
+import matplotlib.pyplot as plt
+from multiprocessing import set_start_method
 
 
 from server import step, reset, drive_car
@@ -157,7 +159,7 @@ class Worker(mp.Process):
 
         drive_car(0, 1, self.port)
 
-        import subprocess
+
         subprocess.Popen(("konsole", "--noclose", "-e", "torcs"))
 
 
@@ -172,7 +174,7 @@ class Worker(mp.Process):
     def run(self):
         total_step = 1
         while self.g_ep.value < MAX_EP:
-            s = reset(self.port, "{}{}".format(self.ip, self.port), greyscale)
+            s = reset(self.port, "{}:{}".format(self.ip, self.port), greyscale)
             #print("img_array", s)
             s = feature_vec(s)
 
@@ -181,23 +183,16 @@ class Worker(mp.Process):
             ep_r = 0.0
             while True:
 
+                # choosing action takes 0.003945827484130859s
+                # step takes 0.50535451889038086s
+                # feature_vec takes 3.1696090698242188e-05s
+
+
                 a = self.lnet.choose_action(s)
 
-
-
-
                 s_, r, done = step(a, self.port, "{}{}".format(self.ip, self.port), greyscale)
-
-
-
                 s_ = feature_vec(s)
-
-
                 print("{}, action = {}, reward = {}, episode reward = {}, restart = {}".format(self.name, a-1, round(r, 2), round(ep_r, 2), done))
-
-
-
-
 
                 ep_r += r
                 buffer_a.append(a)
@@ -240,7 +235,17 @@ def feature_vec(img):
 
 if __name__ == "__main__":
 
-    from multiprocessing import set_start_method
+
+    import shutil
+    shutil.rmtree("instructions/")
+    time.sleep(.5)
+
+    path = "instructions/"
+
+
+    os.mkdir(path)
+
+
 
     set_start_method('spawn')
     # global network
@@ -250,7 +255,7 @@ if __name__ == "__main__":
     opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.), mp.Queue())
     #worker_amount = mp.cpu_count()
-    worker_amount = 2
+    worker_amount = 1
 
     # parallel training
     workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(worker_amount)]
@@ -265,7 +270,7 @@ if __name__ == "__main__":
             break
     [w.join() for w in workers]
 
-    import matplotlib.pyplot as plt
+
     plt.plot(res)
     plt.axis('on')
     plt.ylabel('Moving average ep reward')

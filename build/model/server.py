@@ -3,7 +3,7 @@ from util import check_exit, encrypt, decrypt
 import ctypes
 import numpy as np
 from pro import process
-from video_frame import update
+from video_frame import refresh_plot
 import cv2
 import time
 import matplotlib.pyplot as plt
@@ -17,7 +17,7 @@ def connect(PORT, name, greyscale):
 
     global _connected
     if not _connected:
-        update([[0]], name, greyscale)
+        refresh_plot([[0]], name, greyscale)
         print("Waiting for connection....")
 
     HOST = ""
@@ -64,46 +64,49 @@ def recv_img(PORT, name, greyscale):
 
 
 def format_img(img, greyscale):
+    # reshape img from 1d to 2d
+    img = img.reshape(240, 960)  # 0.00004
 
+    start_time = time.time()
 
-    img = img.reshape(240, 960)
-
-    # convert from having one red column, one green column and then one blue column
-    # to one red pixel, one green pixel and one blue pixel
-    # (I think)
     RGB = []
-    for i in range(0, 240):
-        row = []
-        for j in range(0, 320):
-            row.append([img[i, j * 3], img[i, j * 3 + 1], img[i, j * 3 + 2]])
-        RGB.append(row)
-    img = RGB
+    if greyscale: # takes 0.210s # convert from 240,960 to 240, 320 ()
+        for i in range(0, 240):
+            row = []
+            for j in range(0, 320):
+                # row.append(img[i, j * 3] * 0.299 + img[i, j * 3 + 1] * 0.587 + img[i, j * 3 + 2] + 0.114) # 0.41s
+                row.append(np.dot([img[i, j*3], img[i, j * 3 + 1], img[i, j * 3 + 2]], [0.299, 0.587, 0.114])) # 0.23s
+            RGB.append(row)
+        img = RGB
+    else: # convert from 240,960 to 240, 320 3
+        for i in range(0, 240):
+            row = []
+            for j in range(0, 320):
+                row.append([img[i, j * 3], img[i, j * 3 + 1], img[i, j * 3 + 2]])
+            RGB.append(row)
+        img = RGB
+
 
     # convert image to np array of type float32. Div by 255 as
-    img = np.asarray(img).astype(np.float32)/255
+    img = np.asarray(img).astype(np.float32)/255 # takes 0.0049s
 
     # resizes the image to the hight and width the model requires
-    img = cv2.resize(img, (height, width))
+    img = cv2.resize(img, (height, width))  # takes  0.000333s
+
 
     # image comes in with top at bottom and bottom at top
-    img = np.flip(img, 0)
-
-    # convert to greyscale
-    if greyscale:
-        img = np.dot(img[..., :3], [0.299, 0.587, 0.114])
+    img = np.flip(img, 0) # takes 0.000001s
 
     # preprocessing the image
-    img = process(img, greyscale, height, width)  # <- pre-processed images here
+    img = process(img, greyscale, height, width)  # takes 0.08s
 
-
-
+    # converting image back to RGB
     if greyscale:
-        img = np.stack((img,)*3, axis=-1) # converting greyscale back to rgb
+        img = np.stack((img,)*3, axis=-1) # takes 0.0001s
     else:
         img = np.asarray(img)
 
     return img
-
 
 
 
@@ -126,26 +129,11 @@ def drive_car(action, reset, PORT, _break=0, gear=1, clutch=0):
     f.close()
 
 
-def main():
-    while True:
-        PORT = 50
-        img = recv_img(PORT, "server main", False)
-        if img is not None:
-            reward = int(img[0]) - 1
-            collision = int(img[1])
-            # print("col = {} && rew = {}".format(collision, reward))
-            img = format_img(img, False)
-            drive_car(0, 0, PORT)
-
-
-if __name__ == '__main__':
-    main()
-
-
 def step(action, PORT, name, greyscale):
     img, reward, collision = recieve_data(action, 0, PORT, name, greyscale)
     return (img, reward, collision)
-1
+
+
 
 def reset(PORT, name, greyscale):
     drive_car(0, 1, PORT)
@@ -153,40 +141,33 @@ def reset(PORT, name, greyscale):
     img, reward, collision = recieve_data(0, 0, PORT, name, greyscale)
     return (img)
 
+
 def recieve_data(action, reset, PORT, name, greyscale):
     img = None
     while img.__class__ == None.__class__:
         img = recv_img(PORT, name, greyscale)
 
-    if img is not None:
-        # reward = (float(img[0]) / 100)
-        reward = float(img[0])
+    # reward = (float(img[0]) / 100)
+    reward = float(img[0])
 
-        reward = 1-(reward/100)
+    reward = 1-(reward/100)
 
-        #reward = 1
+    collision = bool(img[1])
 
-        # if reward < -99:
-        #     reward = 0
+    img[0] = 0
+    img[1] = 0
 
-        #reward = normallize(reward, 0, 100)
+    # formats and preprocesses the image
+    img = format_img(img, greyscale)
 
-        # if int(reward) != 02:
-        #      reward = 1
+    # writes driving instructions to file
+    drive_car(action, reset, PORT)
 
-        collision = bool(img[1])
 
-        img[0] = 0
-        img[1] = 0
-
-        img = format_img(img, greyscale)
-
-        drive_car(action, reset, PORT)
-        update(img, name, greyscale)
-    else:
-        raise ValueError("No image was received")
+    refresh_plot(img, name, greyscale)
 
     return img, reward, collision
+
 
 def normallize(x, min, max):
     return (x - min) / (max - min)

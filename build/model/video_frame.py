@@ -3,15 +3,21 @@ import time
 import cv2
 
 
-def update(img, name, greyscale):
+def refresh_plot(img, name, greyscale):
     fig.canvas.set_window_title(name)
+
     if greyscale:
         plt.imshow(img, cmap="gray")
     else:
         plt.imshow(img)
+
     plt.title("What the model sees")
+
     fig.canvas.draw()
-    time.sleep(.05)
+
+    time.sleep(.01)
+
+    fig.clear()
 
 
 plt.rcParams["figure.figsize"] = (2.5, 4.45)
@@ -24,4 +30,4 @@ if __name__ == "__main__":
     img = cv2.imread("test.png")
 
     while True:
-        update(img, "test", False)
+        refresh_plot(img, "test", False)

@@ -65,8 +65,8 @@ def record(global_ep, global_ep_r, ep_r, res_queue, name):
         if global_ep_r.value == 0.:
             global_ep_r.value = ep_r
         else:
-            global_ep_r.value = global_ep_r.value * (1 - UTIL_LR) + ep_r * UTIL_LR
-            # global_ep_r.value = ep_r
+            # global_ep_r.value = global_ep_r.value * (1 - UTIL_LR) + ep_r * UTIL_LR
+            global_ep_r.value = ep_r
     res_queue.put(global_ep_r.value)
     print(
         name,
