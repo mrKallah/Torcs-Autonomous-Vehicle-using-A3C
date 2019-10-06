@@ -176,8 +176,6 @@ static void drive(int index, tCarElt* car, tSituation *s) {
 	//convert port to int
 	int port = stoi(l);
 	
-	cout << HOME << path << "/instructions/" << port << ".ini" << endl;
-	
 	string inifile (HOME + path + "/instructions/" + std::to_string(port) + ".ini");
 	// find_var(filename, category, value name, variable to assign value to)
 	string tmp = "";
@@ -238,7 +236,7 @@ static void drive(int index, tCarElt* car, tSituation *s) {
 			<< "\n" << "Thread ID = " << std::this_thread::get_id()
 			<< "\n" << "Sysvar = " << sysvar
 			<< endl;
-	cout << "###################################" << endl;
+	cout << "###########################" << endl;
 	
 	// checks if 
 	if (car->_collision != 0 || crashed){
