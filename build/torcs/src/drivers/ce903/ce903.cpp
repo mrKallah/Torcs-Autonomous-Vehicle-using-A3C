@@ -129,12 +129,56 @@ static void drive(int index, tCarElt* car, tSituation *s) {
      * car->_gearCmd 
      * car->_clutchCmd 
      */ 
-	ifstream instructions_file (HOME + path + "/drive_instructions.csv");
+	
     string in;
     float accel, steer;
     int restart, gear, clutch, brake;
 	
-	string inifile (HOME + path + "/instructions.ini");
+	
+		// getting the thread id
+	std::stringstream ss;
+	ss << std::this_thread::get_id();
+	string thread_id = ss.str();
+	
+	//system variable manipulation
+	// using the thread id to get ports and ip from environment variable 
+	string variable = "a" + thread_id + "a";
+	
+	// convert string to c string
+	char var[variable.length() + 1];
+	strcpy(var, variable.c_str());
+	
+	// get environment variable
+	const char* sysvar = getenv(var);
+	string varsys = "";
+	
+	// quit if environment variable is empty
+	if (sysvar == NULL) {
+		cout << "Environment variable sysvar is NULL" << endl;
+		sysvar = "NULL";
+		exit(-1);
+	}
+	
+	// separate port and ip using : as delimiter
+	string l = "";
+	string r = "";
+	bool found = false;
+	for (unsigned int i = 0; i < (unsigned)strlen(sysvar); i++){
+		if (sysvar[i] == ':'){
+			found = true;
+		} else if (found){
+			l = l + sysvar[i];
+		} else {
+			r = r + sysvar[i];
+		}
+	}
+
+	//convert port to int
+	int port = stoi(l);
+	
+	cout << HOME << path << "/instructions/" << port << ".ini" << endl;
+	
+	string inifile (HOME + path + "/instructions/" + std::to_string(port) + ".ini");
 	// find_var(filename, category, value name, variable to assign value to)
 	string tmp = "";
 	find_var(inifile, "steer", "accel", tmp);
@@ -180,30 +224,6 @@ static void drive(int index, tCarElt* car, tSituation *s) {
 	car->_clutchCmd = clutch;
     car->_brakeCmd = brake;
     car->_gearCmd = gear;
-	
-	// getting the thread id
-	std::stringstream ss;
-	ss << std::this_thread::get_id();
-	string thread_id = ss.str();
-	
-	//system variable manipulation
-	// using the thread id to get ports and ip from environment variable 
-	string variable = "a" + thread_id + "a";
-	
-	// convert string to c string
-	char var[variable.length() + 1];
-	strcpy(var, variable.c_str());
-	
-	// get environment variable
-	const char* sysvar = getenv(var);
-	string varsys = "";
-	
-	// quit if environment variable is empty
-	if (sysvar == NULL) {
-		cout << "Environment variable sysvar is NULL" << endl;
-		sysvar = "NULL";
-		exit(-1);
-	}
 
 	
     //here the status of the vehicle and program is printed. 
