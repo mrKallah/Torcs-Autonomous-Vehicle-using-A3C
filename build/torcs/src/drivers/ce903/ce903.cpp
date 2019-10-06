@@ -52,7 +52,7 @@ static int  InitFuncPt(int index, void *pt);
 
 string reward_type = "";
 
-
+bool crashed = false;
 
 
 /* 
@@ -110,7 +110,7 @@ static void newrace(int index, tCarElt* car, tSituation *s) {
 	cout << "# Reward type = " << reward_type << endl;
 	cout << "###############################################" << endl;
 	
-    
+    crashed = false;
 } 
 
 
@@ -221,8 +221,9 @@ static void drive(int index, tCarElt* car, tSituation *s) {
 	cout << "###################################" << endl;
 	
 	// checks if 
-	if (car->_collision != 0){
+	if (car->_collision != 0 || crashed){
 		car->_collision = 1;
+		crashed = true;
 	}
 }
 
