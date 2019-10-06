@@ -113,8 +113,8 @@ def dump(filename="Untitled", data=None):
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def drive_car(action, reset, _break=0, gear=1, clutch=0):
-    f = open("instructions.ini", "w")
+def drive_car(action, reset, PORT, _break=0, gear=1, clutch=0):
+    f = open("instructions/{}.ini".format(PORT), "w")
     f.write("[steer]\n"
             "accel={}\n"
             "steer={}\n"
@@ -135,7 +135,7 @@ def main():
             collision = int(img[1])
             # print("col = {} && rew = {}".format(collision, reward))
             img = format_img(img, False)
-            drive_car(0, 0)
+            drive_car(0, 0, PORT)
 
 
 if __name__ == '__main__':
@@ -148,7 +148,7 @@ def step(action, PORT, name, greyscale):
 1
 
 def reset(PORT, name, greyscale):
-    drive_car(0, 1)
+    drive_car(0, 1, PORT)
 
     img, reward, collision = recieve_data(0, 0, PORT, name, greyscale)
     return (img)
@@ -181,7 +181,7 @@ def recieve_data(action, reset, PORT, name, greyscale):
 
         img = format_img(img, greyscale)
 
-        drive_car(action, reset)
+        drive_car(action, reset, PORT)
         update(img, name, greyscale)
     else:
         raise ValueError("No image was received")

@@ -12,7 +12,7 @@ import time
 
 
 
-from server import step, reset
+from server import step, reset, drive_car
 from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate, eps, betas, greyscale, height, width
 from utils import set_init, push_and_pull, record
 
@@ -144,8 +144,7 @@ class Worker(mp.Process):
     def __init__(self, gnet, opt, global_ep, global_ep_r, res_queue, name):
         super(Worker, self).__init__()
         self.name = 'w%i' % name
-        self.g_ep, self.g_ep_r, self.res_queue = global_ep, global_ep_r, \
-            res_queue
+        self.g_ep, self.g_ep_r, self.res_queue = global_ep, global_ep_r, res_queue
         self.gnet, self.opt = gnet, opt
         # local network
         self.lnet = Net(N_S, N_A)
@@ -156,9 +155,9 @@ class Worker(mp.Process):
         self.ip, self.port = contents.split(" ")
         self.port = int(self.port)
 
+        drive_car(0, 1, self.port)
+
         import subprocess
-
-
         subprocess.Popen(("konsole", "--noclose", "-e", "torcs"))
 
 
@@ -192,7 +191,6 @@ class Worker(mp.Process):
 
 
                 s_ = feature_vec(s)
-
 
 
                 print("{}, action = {}, reward = {}, episode reward = {}, restart = {}".format(self.name, a-1, round(r, 2), round(ep_r, 2), done))
