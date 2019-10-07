@@ -3,15 +3,12 @@ AI controller for autonomous cars
 
 [![Torcs A3C Demonstration Video](https://img.youtube.com/vi/Q3pvHS5oj3E/maxresdefault.jpg)](https://youtu.be/Q3pvHS5oj3E "Torcs A3C Demonstration Video")
 
-
-
-The image above is a link to a video that shows the latest example of the model running with multiple workers. Currently both the workers are using the same instructions file to transfer information, thus there will be no improvement in performance. This is only a proof of concept that the multiple workers are working. Over the last iteration there have been multiple performance increases and time between each input from the model has been decreased dastically. Some more work needs to be done to further improve on this. Out two biggest issues are that the model slows down its training/prediction/step in the later epochs which makes the control eratic and unstable and the previosly mentioned issue where all workers write to one output file. The latter issue is a simple fix. The first is going to take a bit of elbow grease to work out. 
-
+The image above is a link to a video that show the latest example of the development. 
 
 ## Todo list
 ### C++
 - [x] [Kallah] Add possibility for c++ to read parameters from .ini file 
-- [ ] Add more comments for c++.
+- [x] Add more comments for c++.
   - [x] [Kallah] ce903.cpp/h
   - [x] [Kallah] exporter.cpp/h
   - [x] [Kallah] raceengine.cpp/h
@@ -27,6 +24,8 @@ The image above is a link to a video that shows the latest example of the model 
 - [x] [Kallah] rename the resize_img function in the exporter class to reshape_img, as it reshapes, it does not resize. 
 - [x] [Kallah] find and get rid of unused methods in the exporter class. 
 - [ ] Remove using namespace std in c++ files to remove bad C++ practices. 
+- [ ] move making images grayscale into c++ for increased performance. 
+- [ ] move preprocessing steps into c++
 
 ### Python
 - [ ] Tune the parameters for model and tried to make the model consistently learn. 
