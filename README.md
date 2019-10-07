@@ -1,7 +1,9 @@
 # Torcs Autonomous Vehicle using A3C
 AI controller for autonomous cars
 
-[![Torcs A3C Demonstration Video](https://img.youtube.com/vi/ut-fejkq8A8/maxresdefault.jpg)](https://www.youtube.com/watch?v=ut-fejkq8A8 "Torcs A3C Demonstration Video")
+[![Torcs A3C Demonstration Video](https://img.youtube.com/vi/Q3pvHS5oj3E/maxresdefault.jpg)](https://youtu.be/Q3pvHS5oj3E "Torcs A3C Demonstration Video")
+
+
 
 The image above is a link to a video that shows the latest example of the model running with multiple workers. Currently both the workers are using the same instructions file to transfer information, thus there will be no improvement in performance. This is only a proof of concept that the multiple workers are working. Over the last iteration there have been multiple performance increases and time between each input from the model has been decreased dastically. Some more work needs to be done to further improve on this. Out two biggest issues are that the model slows down its training/prediction/step in the later epochs which makes the control eratic and unstable and the previosly mentioned issue where all workers write to one output file. The latter issue is a simple fix. The first is going to take a bit of elbow grease to work out. 
 
