@@ -80,7 +80,12 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 	mv geometry.cpp src/drivers/olethros/
 	mv OpenALMusicPlayer.cpp src/libs/musicplayer/
 	
-	
+	# Move the files from build/simulation/model into ~/tesla
+
+	# Open a terminal window and cd to your torcs install directory. 
+
+	# Run the following commands
+
 	sudo ./configure
 	
 	sudo make
@@ -92,3 +97,15 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 	cd ..
 	
 	torcs
+	
+	# if it errors by saying "Unable to open /root/tesla/ports.txt" you know its working. 
+	# Torcs cannot be started with the 'torcs' command, you need to use the classify.py from the tesla directory
+
+	# The Practice and Quickrace options have been pre-configured to use the correct car and map. 
+
+	# Enter a race in Quickrace and use f2 to enter first person mode, the numbers 1 to 6 and 9 to remove all UI elements 
+	#	and m to remove the map. You may need to press the buttons multiple times.
+
+	# Exit torcs either by navigating the menu or selecting the Terminal window you started it from and press ctrl+c
+
+
