@@ -14,9 +14,10 @@ import matplotlib.pyplot as plt
 from multiprocessing import set_start_method
 
 
-from server import step, reset, drive_car
+from server import step, reset
 from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate, eps, betas, greyscale, height, width
 from utils import set_init, push_and_pull, record
+from video_frame import plt_video_frame
 
 
 try:
@@ -157,7 +158,10 @@ class Worker(mp.Process):
         self.ip, self.port = contents.split(" ")
         self.port = int(self.port)
 
-        drive_car(0, 1, self.port)
+        self.frame = plt_video_frame(self.port)
+
+        #drive_car(0, 1, self.port)
+
 
 
         subprocess.Popen(("konsole", "--noclose", "-e", "torcs"))
@@ -174,7 +178,11 @@ class Worker(mp.Process):
     def run(self):
         total_step = 1
         while self.g_ep.value < MAX_EP:
-            s = reset(self.port, "{}:{}".format(self.ip, self.port), greyscale)
+            # restarts the game
+            s = reset(self.port, self.frame)
+            # updates the video frame for matplotlib
+            self.frame.refresh_plot(s)
+
             #print("img_array", s)
             s = feature_vec(s)
 
@@ -187,10 +195,15 @@ class Worker(mp.Process):
                 # step takes 0.50535451889038086s
                 # feature_vec takes 3.1696090698242188e-05s
 
-
+                # have the model make a decision
                 a = self.lnet.choose_action(s)
 
-                s_, r, done = step(a, self.port, "{}{}".format(self.ip, self.port), greyscale)
+                # drive the vehicle
+                s_, r, done = step(a, self.port, self.frame)
+
+                # updates the video frame for matplotlib
+                self.frame.refresh_plot(s_)
+
                 s_ = feature_vec(s)
                 print("{}, action = {}, reward = {}, episode reward = {}, restart = {}".format(self.name, a-1, round(r, 2), round(ep_r, 2), done))
 
@@ -255,7 +268,7 @@ if __name__ == "__main__":
     opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.), mp.Queue())
     #worker_amount = mp.cpu_count()
-    worker_amount = 1
+    worker_amount = 2
 
     # parallel training
     workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(worker_amount)]

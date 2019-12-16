@@ -1,21 +1,14 @@
-import socket
-from util import check_exit, encrypt, decrypt
-import ctypes
 import numpy as np
 from pro import process
-from video_frame import refresh_plot
 import cv2
 import time
-import matplotlib.pyplot as plt
 
-from __init__ import height
-from __init__ import width
 
 
 _connected = False
 
 
-def get_image_from_buffer(port):
+def get_image_from_buffer(port, frame):
     com_file = "/tmp/is{}ready".format(port)
     fifo_pipe = '/tmp/{}.fifo'.format(port)
 
@@ -76,8 +69,6 @@ def get_image_from_buffer(port):
 
     img = process(img, colorspace, height, width)
 
-    refresh_plot(img, "{}".format(port), colorspace)
-
     return img, reward, collision
 
 
@@ -95,8 +86,8 @@ def drive_car(action, reset, PORT, _break=0, gear=1, clutch=0):
     f.close()
 
 
-def step(action, PORT, name, greyscale):
-    img, reward, collision = get_image_from_buffer(PORT) # recieve_data(action, 0, PORT, name, greyscale)
+def step(action, PORT, frame):
+    img, reward, collision = get_image_from_buffer(PORT, frame) # recieve_data(action, 0, PORT, name, greyscale)
     print("reward = {}".format(reward))
     print("collision = {}".format(collision))
     drive_car(action, 0, PORT)
@@ -104,16 +95,14 @@ def step(action, PORT, name, greyscale):
 
 
 
-def reset(PORT, name, greyscale):
+def reset(PORT, frame):
     drive_car(0, 1, PORT)
 
-    img, reward, collision = get_image_from_buffer(PORT) # recieve_data(0, 0, PORT, name, greyscale)
+    img, reward, collision = get_image_from_buffer(PORT, frame) # recieve_data(0, 0, PORT, name, greyscale)
     print("reward = {}".format(reward))
     print("collision = {}".format(collision))
     return (img)
 
-def init(port):
-    refresh_plot([[0]], "{}".format(port), False)
 
 def normallize(x, min, max):
     return (x - min) / (max - min)
