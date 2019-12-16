@@ -15,13 +15,12 @@ public:
 
 	unsigned char* reshape(int& col, int& rew, unsigned char* img);
 
-	void create_client(char * ip, int portnum); 
+	void save_img(unsigned char* img);
 
-	bool svr_connect();
+	std::string int_to_chars(int size, int &bit_count);
 
-	void send_msg(unsigned char* img);
-	
-	void close_connection();
+	void write_to_fifo(unsigned char* img, int port);
+
 
 	char* path = "";
 	int width, height;

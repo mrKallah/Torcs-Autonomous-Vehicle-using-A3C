@@ -2,8 +2,8 @@
 
     file        : raceengine.cpp
     created     : Sat Nov 23 09:05:23 CET 2002
-    copyright   : (C) 2002-2014 by Eric Espie, Bernhard Wymann 
-    email       : eric.espie@torcs.org 
+    copyright   : (C) 2002-2014 by Eric Espie, Bernhard Wymann
+    email       : eric.espie@torcs.org
     version     : $Id: raceengine.cpp,v 1.19.2.23 2014/08/05 23:05:06 berniw Exp $
 
  ***************************************************************************/
@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id: raceengine.cpp,v 1.19.2.23 2014/08/05 23:05:06 berniw Exp $
 */
@@ -70,7 +70,7 @@ ReUpdtPitTime(tCarElt *car)
 	switch (car->_pitStopType) {
 		case RM_PIT_REPAIR:
 			info->totalPitTime = ReInfo->raceRules.pitstopBaseTime + fabs((double)(car->_pitFuel)) / ReInfo->raceRules.refuelFuelFlow + (tdble)(fabs((double)(car->_pitRepair))) * ReInfo->raceRules.damageRepairFactor + car->_penaltyTime;
-			if (ReInfo->s->raceInfo.type == RM_TYPE_PRACTICE || ReInfo->s->raceInfo.type == RM_TYPE_QUALIF) { 
+			if (ReInfo->s->raceInfo.type == RM_TYPE_PRACTICE || ReInfo->s->raceInfo.type == RM_TYPE_QUALIF) {
 				// Ensure that the right min/max values are in the setup structure (could have been modified by the robot))
 				RtInitCarPitSetup(car->_carHandle, &(car->pitcmd.setup), true);
 			} else {
@@ -146,9 +146,9 @@ ReManage(tCarElt *car)
 	tSituation *s = ReInfo->s;
 	const int BUFSIZE = 1024;
 	char buf[BUFSIZE];
-	
+
 	tReCarInfo *info = &(ReInfo->_reCarInfo[car->index]);
-	
+
 	if (car->_speed_x > car->_topSpeed) {
 		car->_topSpeed = car->_speed_x;
 	}
@@ -157,12 +157,12 @@ ReManage(tCarElt *car)
 	if (car->_speed_x > info->topSpd) {
 		info->topSpd = car->_speed_x;
 	}
-	
+
 	if (car->_speed_x < info->botSpd) {
 		info->botSpd = car->_speed_x;
 		car->_currentMinSpeedForLap = car->_speed_x;
 	}
-	
+
 	// Pitstop.
 	if (car->_pit) {
 		if (car->ctrl.raceCmd & RM_CMD_PIT_ASKED) {
@@ -174,7 +174,7 @@ ReManage(tCarElt *car)
 			}
 			memcpy(car->ctrl.msgColor, color, sizeof(car->ctrl.msgColor));
 		}
-		
+
 		if (car->_state & RM_CAR_STATE_PIT) {
 			car->ctrl.raceCmd &= ~RM_CMD_PIT_ASKED; // clear the flag.
 			if (car->_scheduledEventTime < s->currentTime) {
@@ -186,11 +186,11 @@ ReManage(tCarElt *car)
 				snprintf(car->ctrl.msg[2], 32, "in pits %.1fs", s->currentTime - info->startPitTime);
 			}
 		} else if ((car->ctrl.raceCmd & RM_CMD_PIT_ASKED) &&
-					car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
+					car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&
 				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage))
 		{
 			tdble lgFromStart = car->_trkPos.seg->lgfromstart;
-			
+
 			switch (car->_trkPos.seg->type) {
 				case TR_STR:
 					lgFromStart += car->_trkPos.toStart;
@@ -199,7 +199,7 @@ ReManage(tCarElt *car)
 					lgFromStart += car->_trkPos.toStart * car->_trkPos.seg->radius;
 					break;
 			}
-		
+
 			if ((lgFromStart > car->_pit->lmin) && (lgFromStart < car->_pit->lmax)) {
 				pitok = 0;
 				int side;
@@ -211,7 +211,7 @@ ReManage(tCarElt *car)
 					side = TR_SIDE_LFT;
 					toBorder = car->_trkPos.toLeft;
 				}
-				
+
 				sseg = car->_trkPos.seg->side[side];
 				wseg = RtTrackGetWidth(sseg, car->_trkPos.toStart);
 				if (sseg->side[side]) {
@@ -224,7 +224,7 @@ ReManage(tCarElt *car)
 				{
 					pitok = 1;
 				}
-				
+
 				if (pitok) {
 					car->_state |= RM_CAR_STATE_PIT;
 					car->_nbPitStops++;
@@ -248,7 +248,7 @@ ReManage(tCarElt *car)
 			}
 		}
 	}
-	
+
 	/* Start Line Crossing */
 	if (info->prevTrkPos.seg != car->_trkPos.seg) {
 		if ((info->prevTrkPos.seg->raceInfo & TR_LAST) && (car->_trkPos.seg->raceInfo & TR_START)) {
@@ -267,9 +267,9 @@ ReManage(tCarElt *car)
 								car->_bestLapTime = car->_lastLapTime;
 							}
 						}
-						
+
 						car->_commitBestLapTime = true;
-						
+
 						if (car->_pos != 1) {
 							car->_timeBehindLeader = car->_curTime - s->cars[0]->_curTime;
 							car->_lapsBehindLeader = s->cars[0]->_laps - car->_laps;
@@ -301,7 +301,7 @@ ReManage(tCarElt *car)
 								/* save the lap result */
 								ReSavePracticeLap(car);
 								break;
-								
+
 							case RM_TYPE_QUALIF:
 								if (ReInfo->_displayMode == RM_DISP_MODE_NONE) {
 									ReUpdateQualifCurRes(car);
@@ -313,7 +313,7 @@ ReManage(tCarElt *car)
 							ReUpdateQualifCurRes(car);
 						}
 					}
-			
+
 					info->topSpd = car->_speed_x;
 					info->botSpd = car->_speed_x;
 					car->_currentMinSpeedForLap = car->_speed_x;
@@ -364,7 +364,7 @@ ReManage(tCarElt *car)
 		}
 	}
 	ReRaceRules(car);
-	
+
 	info->prevTrkPos = car->_trkPos;
 	car->_curLapTime = s->currentTime - info->sTime;
 	car->_distFromStartLine = car->_trkPos.seg->lgfromstart +
@@ -452,7 +452,7 @@ ReRaceRules(tCarElt *car)
 				}
 			}
 		}
-			
+
 		// If the car cuts a corner the lap time is invalidated. Cutting a corner means: the center of gravity is more than 0.7 times the car width
 		// away from the main track segment on the inside of a turn. The rule does not apply on the outside and on straights, pit entry and exit
 		// count as well as track.
@@ -501,7 +501,7 @@ ReRaceRules(tCarElt *car)
 				minradius -= cuttinglimit;
 				if (minradius > 1.0f) {
 					car->_penaltyTime += car->pub.speed*RCM_MAX_DT_SIMU*(-toborder-cuttinglimit)/minradius;
-				}			
+				}
 			}
 		}
 	}
@@ -518,7 +518,7 @@ ReRaceRules(tCarElt *car)
 			car->_state |= RM_CAR_STATE_ELIMINATED;
 			return;
 		}
-	
+
 		switch (penalty->penalty) {
 			case RM_PENALTY_DRIVETHROUGH:
 				snprintf(car->ctrl.msg[3], 32, "Drive Through Penalty");
@@ -530,10 +530,10 @@ ReRaceRules(tCarElt *car)
 				*(car->ctrl.msg[3]) = 0;
 				break;
 		}
-		
+
 		memcpy(car->ctrl.msgColor, color, sizeof(car->ctrl.msgColor));
 	}
-    
+
 	if (prevSeg->raceInfo & TR_PITSTART) {
 		/* just entered the pit lane */
 		if (seg->raceInfo & TR_PIT) {
@@ -578,7 +578,7 @@ ReRaceRules(tCarElt *car)
 				GF_TAILQ_REMOVE(&(car->_penaltyList), penalty, link);
 				FREEZ(penalty);
 			}
-			
+
 			rules->ruleState = 0;
 		} else {
 			/* went out of the pit lane illegally... */
@@ -628,7 +628,7 @@ ReOneStep(double deltaTimeIncrement)
 	int i;
 	tRobotItf *robot;
 	tSituation *s = ReInfo->s;
-	
+
 	/**
 	if ((ReInfo->_displayMode != RM_DISP_MODE_NONE) && (ReInfo->_displayMode != RM_DISP_MODE_CONSOLE)) {
 		if (floor(s->currentTime) == -2.0) {
@@ -684,7 +684,7 @@ ReStart(void)
 {
     ReInfo->_reRunning = 1;
     ReInfo->_reCurTime = GfTimeClock() - RCM_MAX_DT_SIMU;
-    
+
 }
 
 void
@@ -702,7 +702,7 @@ reCapture(void)
 	tRmMovieCapture	*capture = &(ReInfo->movieCapture);
 	const int BUFSIZE = 1024;
 	char buf[BUFSIZE];
-	
+
 	GfScrGetSize(&sw, &sh, &vw, &vh);
 	img = (unsigned char*)malloc(vw * vh * 3);
 	if (img == NULL) {
@@ -730,71 +730,64 @@ ReUpdate(void)
 	int mode = RM_ASYNC;
 	int i, sw, sh, vw, vh;
 	const int MAXSTEPS = 2000;
-	
+
 	//int current = GfTimeClock();
 
-    
+
 	//current = GfTimeClock();
     //if (current - ReInfo->_lastSend > 0) {
-    // this ifstatement controls how often to try to send the image to the model. 
+    // this ifstatement controls how often to try to send the image to the model.
 	//If 1 it sends it each step, if 200 it sends it each 200th step
-	if (ReInfo->_count == 1) {
+	if (ReInfo->_count == 2000) {
 		//ReInfo->_lastSend = current;
-		
-		//This allocates a memory possition for the image. 
-        GfScrGetSize(&sw, &sh, &vw, &vh);
-        img = (unsigned char*)malloc(vw * vh * 3);
-        if (img == NULL) {
-            std::cout << "<-----Failed to Secure Memory Location----->" << "\n";
-        }
-		
+
+		//This allocates a memory possition for the image.
+    GfScrGetSize(&sw, &sh, &vw, &vh);
+    img = (unsigned char*)malloc(vw * vh * 3);
+    if (img == NULL) {
+        std::cout << "<-----Failed to Secure Memory Location----->" << "\n";
+    }
+
 		//This extracts the image from the video buffer
-        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-        glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        glReadBuffer(GL_FRONT);
-        glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
-				
-		//restaring the race if the model requests it 
-		if (s->cars[0]->_askRestart){
-			ReRaceCleanup();
-			ReInfo->_reState = RE_STATE_PRE_RACE;
-			GfuiScreenActivate(ReInfo->_reGameScreen);
-		}
-		
-		//here the exporter is created and the collision and reward variables are stored locally. 
-        Exporter exporter = Exporter(vw, vh);
+    glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadBuffer(GL_FRONT);
+    glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
+
+		//here the exporter is created and the collision and reward variables are stored locally.
+    Exporter exporter = Exporter(vw, vh);
 		int col = int(s->cars[0]->_collision);
 		int rew = int(s->cars[0]->_reward);
-		
+
 		// the image is converted from one shape to another. (Not sure from what to what)
-		// current img is free'd within this function and a updated malloc is returned. 
-        img = exporter.reshape(col, rew, img);
-		
+		// current img is free'd within this function and a updated malloc is returned.
+    img = exporter.reshape(col, rew, img);
+
 		// getting thread ID which is used to allocate ports and ips.
 		std::stringstream ss;
 		ss << std::this_thread::get_id();
 		string thread_id = ss.str();
-		
+
 		// the ports are handled in src/libs/client/mainmenu.cpp
 		// system variable manipulation
 		// getting the variable name by appending a to start and end of thread id
 		string variable = "a" + thread_id + "a";
-		
+
 		// converting variable name from string to c string
 		char var[variable.length() + 1];
 		strcpy(var, variable.c_str());
-	
+
 		// reading environment variable using variable name
 		const char* sysvar = getenv(var);
 		string varsys = "";
-		
+
 		//quitting if enironemnt variable does not contain ip and ports
 		if (sysvar == NULL) {
 			std::cout << "Environment variable 'sysvar' is NULL" << std::endl;
 			sysvar = "NULL";
 			exit(-1);
 		}
-		
+
 		// separate port and ip using : as delimiter
 		string l = "";
 		string r = "";
@@ -808,40 +801,39 @@ ReUpdate(void)
 				r = r + sysvar[i];
 			}
 		}
-		
+
 		//convert port to int
 		int port = stoi(l);
-			
+
 		//convert ip to c string
 		char ip[r.length() + 1];
 		strcpy(ip, r.c_str());
-		
-		// here the image is exported from this program to the model in Python
-        //exporter.save_to_file();
-        exporter.create_client(ip, port);	//CHANGE PORT NUMBER
-        bool connected = exporter.svr_connect();
-        if (connected) {
-            exporter.send_msg(img);
-        }
-		
-		// the conncection is closed.
-        exporter.close_connection();
-        exporter.~Exporter();
-        ReInfo->_count = 0;
-		
-		// The malloc is freed. 
+
+		exporter.write_to_fifo(img, port);
+
+    exporter.~Exporter();
+    ReInfo->_count = 0;
+
+		// The malloc of the image is freed.
 		free(img);
-		
+
+		//restaring the race if the model requests it
+		if (s->cars[0]->_askRestart){
+			ReRaceCleanup();
+			ReInfo->_reState = RE_STATE_PRE_RACE;
+			GfuiScreenActivate(ReInfo->_reGameScreen);
+		}
+
     } else {
         ReInfo->_count++;
     }
-	
+
 	START_PROFILE("ReUpdate");
 	ReInfo->_refreshDisplay = 0;
 	switch (ReInfo->_displayMode) {
 		case RM_DISP_MODE_NORMAL:
 			t = GfTimeClock();
-			
+
 			i = 0;
 			START_PROFILE("ReOneStep*");
 			while ((ReInfo->_reRunning && ((t - ReInfo->_reCurTime) > RCM_MAX_DT_SIMU)) && MAXSTEPS > i++) {
@@ -853,7 +845,7 @@ ReUpdate(void)
 				// Cannot keep up with time warp, reset time to avoid lag when running slower again
 				ReInfo->_reCurTime = GfTimeClock();
 			}
-            
+
             GfuiDisplay();
             ReInfo->_reGraphicItf.refresh(ReInfo->s);
             glutPostRedisplay();	/* Callback -> reDisplay */
@@ -924,9 +916,7 @@ ReTimeMod (void *vcmd)
 
 	const int BUFSIZE = 1024;
 	char buf[BUFSIZE];
-	
+
 	snprintf(buf, BUFSIZE, "Time x%.2f", 1.0 / ReInfo->_reTimeMult);
 	ReRaceMsgSet(buf, 5);
 }
-
-
