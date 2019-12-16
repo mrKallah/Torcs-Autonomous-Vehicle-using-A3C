@@ -738,7 +738,7 @@ ReUpdate(void)
     //if (current - ReInfo->_lastSend > 0) {
     // this ifstatement controls how often to try to send the image to the model.
 	//If 1 it sends it each step, if 200 it sends it each 200th step
-	if (ReInfo->_count == 2000) {
+	if (ReInfo->_count == 0) {
 		//ReInfo->_lastSend = current;
 
 		//This allocates a memory possition for the image.
@@ -759,9 +759,8 @@ ReUpdate(void)
 		int col = int(s->cars[0]->_collision);
 		int rew = int(s->cars[0]->_reward);
 
-		// the image is converted from one shape to another. (Not sure from what to what)
-		// current img is free'd within this function and a updated malloc is returned.
-    img = exporter.reshape(col, rew, img);
+		// reshapes the image from 640 480 to 320 240
+    img = exporter.resize(col, rew, img);
 
 		// getting thread ID which is used to allocate ports and ips.
 		std::stringstream ss;

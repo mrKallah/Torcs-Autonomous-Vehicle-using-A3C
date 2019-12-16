@@ -29,11 +29,11 @@ Exporter::~Exporter() {
 
 }
 
-/*	This method reshapes the image form an unknown shape (needs further looking into) to a
-	rgb image where each of the different channels contains only one color.
-	This method also encodes the reward and collition state into the image for sending.
+/*	This method resizes the image from 640x480 to 320x240 and
+		then encodes the collision and reward to the first and second
+		pixel
 */
-unsigned char* Exporter::reshape(int& col, int& rew, unsigned char* img) {
+unsigned char* Exporter::resize(int& col, int& rew, unsigned char* img) {
 	//cout << "Resizing....\n";
 
 	unsigned char* img_resize = (unsigned char*)malloc(width * height * 3);
@@ -64,6 +64,12 @@ unsigned char* Exporter::reshape(int& col, int& rew, unsigned char* img) {
 	width = 320;
 	height = 240;
 	bufsize = width*height*3;
+
+	// for some reason collision starts out being 3, so it gets encoded to 0.
+	if (col == 3) {
+		 col = 0;
+	}
+
 
 	*(img_resize + 0) = (unsigned char) rew;
 	*(img_resize + 1) = (unsigned char) col;
@@ -222,6 +228,6 @@ void Exporter::save_img(unsigned char* img){
 		}
   }
   else {
-		cout << "Unable to open file";
+		cout << "Unable to open file" << endl;
 	}
 }

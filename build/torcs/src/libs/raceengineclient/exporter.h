@@ -13,7 +13,7 @@ public:
 
 	~Exporter();
 
-	unsigned char* reshape(int& col, int& rew, unsigned char* img);
+	unsigned char* resize(int& col, int& rew, unsigned char* img);
 
 	void save_img(unsigned char* img);
 
