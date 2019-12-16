@@ -235,13 +235,13 @@ def feature_vec(img):
 
 if __name__ == "__main__":
 
-
-    import shutil
-    shutil.rmtree("instructions/")
-    time.sleep(.5)
-
     path = "instructions/"
-
+    import shutil
+    try:
+        shutil.rmtree(path)
+        time.sleep(.5)
+    except:
+        None
 
     os.mkdir(path)
 

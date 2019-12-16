@@ -19,7 +19,8 @@ def refresh_plot(img, name, greyscale):
 
     fig.clear()
 
-
+import matplotlib
+matplotlib.use("TkAgg")
 plt.rcParams["figure.figsize"] = (2.5, 4.45)
 
 fig = plt.figure()

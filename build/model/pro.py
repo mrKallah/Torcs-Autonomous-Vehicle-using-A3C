@@ -121,6 +121,9 @@ def rm_line(img, height, width):
 
 def process(img, greyscale, height, width):
 
+    if greyscale == 3:
+        greyscale = False
+
     # set height and width
     strength = 0.2
 
