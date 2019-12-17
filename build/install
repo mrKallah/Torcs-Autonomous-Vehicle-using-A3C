@@ -118,7 +118,7 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 	cd ../tesla/
 	
 	# use this command to start the model
-	python3 ~/tesla/classify.py
+	sudo python3 ~/tesla/classify.py
 	
 	# if it errors by saying "Unable to open /root/tesla/ports.txt" you know its working. 
 	# Torcs cannot be started with the 'torcs' command, you need to use the classify.py from the tesla directory
