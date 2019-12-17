@@ -82,10 +82,19 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 	cd ..
 	
 # torcs 
-
+	
+	cd ~
+	
 	wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/torcs/1.3.7+dfsg-4/torcs_1.3.7+dfsg.orig.tar.xz
+	
+	git clone https://github.com/mrKallah/Torcs-Autonomous-Vehicle-using-A3C.git
+	
 	tar -xf torcs_1.3.7+dfsg.orig.tar.xz
 	rm torcs_1.3.7+dfsg.orig.tar.xz
+	
+	sudo cp -r Torcs-Autonomous-Vehicle-using-A3C/build/torcs/* torcs-1.3.7+dfsg/
+	sudo cp -r Torcs-Autonomous-Vehicle-using-A3C/build/model/* tesla/ 
+	
 	cd torcs-1.3.7+dfsg/
 	
 	# fix some file before compiling (required for x64)
@@ -94,9 +103,7 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 	mv geometry.cpp src/drivers/olethros/
 	mv OpenALMusicPlayer.cpp src/libs/musicplayer/
 	
-	# Move the files from build/simulation/model into ~/tesla
-
-	# Open a terminal window and cd to your torcs install directory. 
+	
 
 	# Run the following commands
 
@@ -108,9 +115,10 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 	
 	sudo make datainstall
 	
-	cd ..
+	cd ../tesla/
 	
-	torcs
+	# use this command to start the model
+	python3 ~/tesla/classify.py
 	
 	# if it errors by saying "Unable to open /root/tesla/ports.txt" you know its working. 
 	# Torcs cannot be started with the 'torcs' command, you need to use the classify.py from the tesla directory
