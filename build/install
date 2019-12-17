@@ -120,6 +120,14 @@ sudo apt-get install -y make perl gcc rpm git mesa-utils libxmu-dev libxmu6 libx
 	# use this command to start the model
 	sudo python3 ~/tesla/classify.py
 	
+	# sometimes on first install you may get an error which ends in 
+	# FileNotFoundError: [Errno 2] No such file or directory: 'ports.txt'
+	# for this, try starting the game again
+	
+	# furthermore another known issue is on some systems such as bash on ubuntu on windows,
+	# the plotting will not work. 
+	
+	
 	# if it errors by saying "Unable to open /root/tesla/ports.txt" you know its working. 
 	# Torcs cannot be started with the 'torcs' command, you need to use the classify.py from the tesla directory
 
