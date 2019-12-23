@@ -102,13 +102,21 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 static void newrace(int index, tCarElt* car, tSituation *s) {
   crashed = false;
   car->_collision = 0;
+  string s_do_resize = "";
+  bool do_resize;
   string inifile (HOME + path + "/torcs.ini");
 	// find_var(filename, category, value name, variable to assign value to)
 	find_var(inifile, "torcs", "reward_type", reward_type);
+  find_var(inifile, "torcs", "do_resize", s_do_resize);
+
+  do_resize = s_do_resize == "true" || s_do_resize == "True";
+
+  car->_do_resize = do_resize;
 
 	cout << "###############################################" << endl;
 	cout << "##### Startinga new race with parameters: " << endl;
 	cout << "# Reward type = " << reward_type << endl;
+  cout << "# Do resize = " << do_resize << endl;
 	cout << "###############################################" << endl;
 
 }
