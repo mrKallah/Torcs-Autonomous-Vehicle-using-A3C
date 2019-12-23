@@ -42,7 +42,7 @@ def plot_image(image, name="", plt_show=True):
         plt.show()
 
 
-def rm_green(img, height, width, r_threshold=0.1, g_threshold=0.1, b_threshold=0.1):
+def rm_green(img, r_threshold=0.1, g_threshold=0.1, b_threshold=0.1):
     """
 	Makes the any pixel within a color range white and any pixel above that pixel white.
 	Can be used for removing redundant information if you have a color boundary.
@@ -74,6 +74,9 @@ def rm_green(img, height, width, r_threshold=0.1, g_threshold=0.1, b_threshold=0
 	:param b_threshold: the threshold for the blue color range
 	:return: the processed image and the lowest non white pixel
 	"""
+
+    height = img.shape[0]
+    width = img.shape[1]
 
     # create a copy of image to avoid editing the original image
     green = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -119,10 +122,12 @@ def rm_line(img, height, width):
     return line
 
 
-def process(img, greyscale, height, width):
+def process(img):
 
-    if greyscale == 3:
+    if len(img.shape) == 3:
         greyscale = False
+    else:
+        greyscale = True
 
     # set height and width
     strength = 0.2
@@ -132,15 +137,18 @@ def process(img, greyscale, height, width):
 
     if greyscale:
         # removes the green top of the image
-        img = rm_green_bw(img, height, width)
+        img = rm_green_bw(img)
     else:
         # removes the green top of the image
-        img = rm_green(img, height, width)
+        img = rm_green(img)
 
     return img
 
 
-def rm_green_bw(img, height, width, threshold=0.28):
+def rm_green_bw(img, threshold=0.28):
+
+    height = img.shape[0]
+    width = img.shape[1]
 
     # go through from side to side
     for w in range(0, width):

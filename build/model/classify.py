@@ -205,7 +205,11 @@ class Worker(mp.Process):
                 self.frame.refresh_plot(s_)
 
                 s_ = feature_vec(s)
-                print("{}, action = {}, reward = {}, episode reward = {}, restart = {}".format(self.name, a-1, round(r, 2), round(ep_r, 2), done))
+                # -1 is one char longer than 1 or 0, so adding a space to 1 and 0 in order to avoid having shaky text
+                if a-1 == -1:
+                    print("{}, action = {}, reward = {}, episode reward = {}, restart = {}".format(self.name, a - 1, round(r, 2), round(ep_r, 2), done))
+                else:
+                    print("{}, action = {},  reward = {}, episode reward = {}, restart = {}".format(self.name, a - 1, round(r, 2), round(ep_r, 2), done))
 
                 ep_r += r
                 buffer_a.append(a)
@@ -268,7 +272,7 @@ if __name__ == "__main__":
     opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.), mp.Queue())
     #worker_amount = mp.cpu_count()
-    worker_amount = 2
+    worker_amount = 1
 
     # parallel training
     workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(worker_amount)]

@@ -6,14 +6,22 @@ import numpy as np
 
 class plt_video_frame:
     def __init__(self, port):
+        '''
+        creates the plot window.
+        '''
         matplotlib.use("TkAgg")
         self.fig = plt.figure(figsize=(3.25, 2.75))
         self.port = port
 
 
-
-
     def refresh_plot(self, img):
+        '''
+        Refreshes the plot with an image.
+        '''
+
+        if img.shape[0] != 240:
+            img = cv2.resize(img, (320, 240))
+
         self.fig.clf()
         self.fig.canvas.flush_events()
 

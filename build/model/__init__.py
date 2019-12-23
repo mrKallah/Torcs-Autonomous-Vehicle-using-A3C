@@ -1,19 +1,24 @@
-GAMMA = 0.99 # 0.9
-UTIL_LR = 0.01 # might be entropy_beta
-learning_rate = 0.001 # was 0.0002
-eps = 1e-8 # eps (float, optional): term added to the denominator to improve numerical stability (default: 1e-8)
-betas = (0.9, 0.999) # betas (Tuple[float, float], optional): coefficients used for computing running averages of gradient and its square (default: (0.9, 0.999))
+import configparser
+import ast
 
+config = configparser.ConfigParser(inline_comment_prefixes=";")
+config.read('torcs.ini')
 
+GAMMA = float(config["model"]["gamma"])
+UTIL_LR = float(config["model"]["util_learning_rate"])
+learning_rate = float(config["model"]["learning_rate"])
+eps = float(config["model"]["eps"])
+betas = ast.literal_eval(config["model"]["betas"])
+UPDATE_GLOBAL_ITER = int(config["model"]["update_global_iter"])
+MAX_EP = int(config["model"]["max_ep"])
+MAX_EP_STEP = int(config["model"]["max_ep_step"])
 
-UPDATE_GLOBAL_ITER = 5
-MAX_EP = 300
-MAX_EP_STEP = 200
+greyscale = config["general"]["cvt_to_black_and_white"].lower() == "true"
+do_preprocess = config["general"]["do_preprocess"].lower() == "true"
 
+do_resize = bool(config["torcs"]["do_resize"])
 
-
-
-greyscale = True
+# this is the height and width for the models training and has nothing to do with the resizing from torcs
 height = 224
 width = 224
 
