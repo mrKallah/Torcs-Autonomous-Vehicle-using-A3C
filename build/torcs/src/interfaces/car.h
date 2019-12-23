@@ -191,7 +191,7 @@ typedef struct {
 
 /** Public info on the cars */
 typedef struct {
-    tDynPt	DynGC;		/**< GC data (car axis) */    
+    tDynPt	DynGC;		/**< GC data (car axis) */
     tDynPt	DynGCg;		/**< GC data (world axis) */
 	tdble	speed;		// total speed, sqrt(vx*vx + vy*vy + vz*vz)
     sgMat4	posMat;		/**< position matrix */
@@ -317,6 +317,9 @@ typedef struct {
     int		debug;
 	tCollisionState collision_state; /**< collision state */
 	float 	reward;
+  int current_speed;
+  bool do_resize;
+
 } tPrivCar;
 /* structure access */
 #define _driverIndex	priv.driverIndex
@@ -341,6 +344,8 @@ typedef struct {
 #define _dammage	priv.dammage
 #define _collision	priv.collision // used for ce903
 #define _reward		priv.reward // used for ce903
+#define _do_resize priv.do_resize // used for ce903
+#define _current_speed priv.current_speed // used for ce903
 
 
 /** Info returned by driver during the race */
@@ -374,7 +379,7 @@ typedef struct {
 
 struct RobotItf;
 
-typedef struct 
+typedef struct
 {
 	tdble value;
 	tdble min;
@@ -383,11 +388,11 @@ typedef struct
 
 
 
-typedef struct 
+typedef struct
 {
 	// Steer
 	tCarPitSetupValue steerLock;
-	
+
 	//Wheel
 	tCarPitSetupValue wheelcamber[4];
 	tCarPitSetupValue wheeltoe[4];
@@ -432,7 +437,7 @@ typedef struct
 } tCarPitSetup;
 
 /** Command issued by the car during pit stop */
-typedef struct 
+typedef struct
 {
     tdble		fuel;
     int			repair;
@@ -684,8 +689,4 @@ typedef struct CarElt
 #define SEM_COLLISION_Z_CRASH	0x10
 
 
-#endif /* __CARV1_H__ */ 
-
-
-
-
+#endif /* __CARV1_H__ */
