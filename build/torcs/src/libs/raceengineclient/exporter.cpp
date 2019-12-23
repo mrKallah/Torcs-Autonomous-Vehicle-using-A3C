@@ -61,20 +61,32 @@ unsigned char* Exporter::resize(int& col, int& rew, unsigned char* img) {
 
 		}
 	}
-	width = 320;
-	height = 240;
-	bufsize = width*height*3;
+	free(img);
+	return img_resize;
+}
 
-	// for some reason collision starts out being 3, so it gets encoded to 0.
-	if (col == 3) {
-		 col = 0;
+unsigned char* Exporter::flip_and_mirror(int height, int width, int colorspace, unsigned char* img) {
+	// alocate the memory space for the image
+	unsigned char* img_resize = (unsigned char*)malloc(width * height * 3);
+
+	int j = 0;
+	for (int h = 0; h < height; h++){
+		int i = 0;
+		for (int w = 0; w < width; w++){
+			for (int c = 0; c < colorspace; c++){
+					// read each pixel starting from the bottom left moving right and then upwards
+					int forwards = (height * width * colorspace) - (h * (width * colorspace)) + i - (width * colorspace);
+					//replacing pixles
+					*(img_resize + forwards) = *(img + j);
+
+					i ++;
+					j++;
+			}
+		}
 	}
 
-
-	*(img_resize + 0) = (unsigned char) rew;
-	*(img_resize + 1) = (unsigned char) col;
-
 	free(img);
+
 	return img_resize;
 }
 
@@ -105,25 +117,38 @@ string Exporter::int_to_chars(int size, int &bit_count){
 	return output;
 }
 
-void Exporter::write_to_fifo(unsigned char* img, int port){
+void Exporter::write_to_fifo(unsigned char* img, int port, int reward, int collision, int height, int width){
+		// for some reason collision starts out being 3, so it gets encoded to 0.
+		if (collision == 3) {
+			 collision = 0;
+		}
 
 	string line;
 	string com_file = "/tmp/is" + to_string(port) + "ready";
 	string fifo_file = "/tmp/" + to_string(port) + ".fifo";
 
+	// read the file that dictates if the model is ready to recieve an image
+	// this file will contain a 0 if the model is not ready,
+	// a 1 if the images should be converted to grayscale
+	// and a 2 if the image should be rgb
 	ifstream myfile (com_file);
 	if (myfile.is_open()) {
 		getline (myfile, line);
 		myfile.close();
 	} else {
-		cout << "Unable to open file";
+		cout << "Unable to open file" << endl;
 	}
 
-	if (line == "1"){
+	if (line == "1" || line == "2"){
 
-		int height = 240; //240
-		int width = 320; //320
-		int colorspace = 3; //3
+		int colorspace;
+
+		if (line == "1") {
+			colorspace = 1;
+		} else {
+			colorspace = 3;
+		}
+
 
 		//temp string to store info
 		string s = "";
@@ -137,12 +162,20 @@ void Exporter::write_to_fifo(unsigned char* img, int port){
 		int h_bits = 0;
 		int w_bits = 0;
 		int c_bits = 0;
+		int reward_bits = 0;
+		int collision_bits = 0;
+		// start bits is the amount of bit variables
+		int startbits = 5;
+
 		char ctest;
+
+
 
 		string s_h = int_to_chars(height, h_bits);
 		string s_w = int_to_chars(width, w_bits);
 		string s_c = int_to_chars(colorspace, c_bits);
-
+		string s_reward = int_to_chars(reward, reward_bits);
+		string s_collision = int_to_chars(collision, collision_bits);
 
 		ctest = static_cast<char>( h_bits );
 		s += ctest;
@@ -153,28 +186,51 @@ void Exporter::write_to_fifo(unsigned char* img, int port){
 		ctest = static_cast<char>( c_bits );
 		s += ctest;
 
-		s += s_h + s_w + s_c;
+		ctest = static_cast<char>( reward_bits );
+		s += ctest;
 
+		ctest = static_cast<char>( collision_bits );
+		s += ctest;
 
-		// writing image to pnm format
+		s += s_h + s_w + s_c + s_reward + s_collision;
+
+		// writing image to fifo file
+		int pixel = 0;
 		int i = 0;
 		for (int h = 0; h < height; h++){
 			for (int w = 0; w < width; w++){
-				for (int rgb = 0; rgb < colorspace; rgb++){
+				for (int rgb = 0; rgb < 3; rgb++){
 
-					char ctest = static_cast<char>( (int)(*(img + i)) );
-					s += ctest;
+					// convert to greyscale if needed
+					if (colorspace == 1){
+						// add pixels to integer value
+						pixel += (int)(*(img + i));
+
+						if (rgb == 2){
+							// add the accumilation of the three rgb values
+							// to the string and set the pixel value to 0
+							char ctest = static_cast<char>( pixel / 3 );
+							s += ctest;
+							pixel = 0;
+						}
+
+					}else {
+						char ctest = static_cast<char>( (int)(*(img + i)) );
+						s += ctest;
+					}
+
 					i++;
 
 				}
 			}
 		}
 
+
 		const char* cimg = s.c_str();
 		// the size of the string is the height * width * colorspace
 		// then you have to add the length of the encoding of the h w and c bits and the 3 bits
 		// that contain how many bits belongs to h w and c
-		write(fd, cimg, height * width * colorspace + h_bits + w_bits + c_bits + 3+ 1);
+		write(fd, cimg, height * width * colorspace + h_bits + w_bits + c_bits + reward_bits + collision_bits + startbits + 1);
 		close(fd);
 
 		ofstream myfile (com_file);
@@ -183,7 +239,7 @@ void Exporter::write_to_fifo(unsigned char* img, int port){
 			myfile.close();
 		}
 		else {
-			cout << "Unable to open file";
+			cout << "Unable to open file" << endl;
 		}
 
 	}

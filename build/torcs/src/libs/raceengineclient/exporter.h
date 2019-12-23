@@ -15,11 +15,13 @@ public:
 
 	unsigned char* resize(int& col, int& rew, unsigned char* img);
 
+	unsigned char* flip_and_mirror(int height, int width, int colorspace, unsigned char* img);
+
 	void save_img(unsigned char* img);
 
 	std::string int_to_chars(int size, int &bit_count);
 
-	void write_to_fifo(unsigned char* img, int port);
+	void write_to_fifo(unsigned char* img, int port, int reward, int collision, int height, int width);
 
 
 	char* path = "";

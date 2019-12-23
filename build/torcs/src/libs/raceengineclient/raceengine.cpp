@@ -758,9 +758,20 @@ ReUpdate(void)
     Exporter exporter = Exporter(vw, vh);
 		int col = int(s->cars[0]->_collision);
 		int rew = int(s->cars[0]->_reward);
+		bool do_resize = s->cars[0]->_do_resize;
+
+		int height;
+		int width;
 
 		// reshapes the image from 640 480 to 320 240
-    img = exporter.resize(col, rew, img);
+		if (do_resize){
+			height = 240;
+			width = 320;
+			img = exporter.resize(col, rew, img);
+		} else{
+			height = 480;
+			width = 640;
+		}
 
 		// getting thread ID which is used to allocate ports and ips.
 		std::stringstream ss;
@@ -808,7 +819,9 @@ ReUpdate(void)
 		char ip[r.length() + 1];
 		strcpy(ip, r.c_str());
 
-		exporter.write_to_fifo(img, port);
+		img = exporter.flip_and_mirror(height, width, 3, img);
+
+		exporter.write_to_fifo(img, port, rew, col, height, width);
 
     exporter.~Exporter();
     ReInfo->_count = 0;
