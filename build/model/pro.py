@@ -1,3 +1,4 @@
+"""
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -5,6 +6,9 @@ import time
 
 blur_size = 5
 kernel = np.ones((blur_size, blur_size), np.float32) / (blur_size * blur_size)
+
+
+# THIS FILE HAS BEEN MADE REDUNDANT
 
 def plot_image(image, name="", plt_show=True):
     '''
@@ -43,7 +47,7 @@ def plot_image(image, name="", plt_show=True):
 
 
 def rm_green(img, r_threshold=0.1, g_threshold=0.1, b_threshold=0.1):
-    """
+    '''
 	Makes the any pixel within a color range white and any pixel above that pixel white.
 	Can be used for removing redundant information if you have a color boundary.
 	Example: If you have an image:
@@ -73,7 +77,7 @@ def rm_green(img, r_threshold=0.1, g_threshold=0.1, b_threshold=0.1):
 	:param g_threshold: the threshold for the green color range
 	:param b_threshold: the threshold for the blue color range
 	:return: the processed image and the lowest non white pixel
-	"""
+	'''
 
     height = img.shape[0]
     width = img.shape[1]
@@ -103,13 +107,13 @@ def rm_green(img, r_threshold=0.1, g_threshold=0.1, b_threshold=0.1):
 
 
 def rm_line(img, height, width):
-    """
+    '''
 	Looks at the bottom line of the image and if a pixel is white, then make all pixels above it black
 	:param img: the image to process
 	:param height: the height of the input image
 	:param width: the width of the input image
 	:return: the processed image
-	"""
+	'''
 
     # create a copy of image to avoid editing the original image
     line = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -202,3 +206,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""

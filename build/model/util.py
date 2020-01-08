@@ -1,3 +1,7 @@
+"""
+
+THIS HAS BEEN DEPRICATED
+
 def check_exit(s):
 	if "#" in s.decode():
 		print("Disconnected....")
@@ -19,3 +23,5 @@ def decrypt(s):
 	for i in s:
 		t+=chr(ord(i)^key)
 	return str.encode(t)
+
+"""

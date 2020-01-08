@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 from multiprocessing import set_start_method
 
 
-from server import step, reset
-from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate, eps, betas, greyscale, height, width
+from server import step
+from __init__ import UPDATE_GLOBAL_ITER, GAMMA, MAX_EP, learning_rate, eps, betas, greyscale, height, width, worker_amount, starting_port
 from utils import set_init, push_and_pull, record
 from video_frame import plt_video_frame
 
@@ -179,7 +179,7 @@ class Worker(mp.Process):
         total_step = 1
         while self.g_ep.value < MAX_EP:
             # restarts the game
-            s = reset(self.port, self.frame)
+            s = step(0, 1, self.port)[0]
             # updates the video frame for matplotlib
             self.frame.refresh_plot(s)
 
@@ -190,16 +190,11 @@ class Worker(mp.Process):
             buffer_s, buffer_a, buffer_r = [], [], []
             ep_r = 0.0
             while True:
-
-                # choosing action takes 0.003945827484130859s
-                # step takes 0.50535451889038086s
-                # feature_vec takes 3.1696090698242188e-05s
-
                 # have the model make a decision
                 a = self.lnet.choose_action(s)
 
                 # drive the vehicle
-                s_, r, done = step(a, self.port, self.frame)
+                s_, r, done = step(a, 0, self.port)
 
                 # updates the video frame for matplotlib
                 self.frame.refresh_plot(s_)
@@ -252,16 +247,25 @@ def feature_vec(img):
 
 if __name__ == "__main__":
 
+    # remove the old instructions from the instructions folder.
     path = "instructions/"
     import shutil
     try:
         shutil.rmtree(path)
         time.sleep(.5)
+        os.mkdir(path)
     except:
-        None
+        print("Could not access the instructions folder / instructions files for reading and writing")
+        exit()
 
-    os.mkdir(path)
-
+    # Resetting the ports to start at 9800
+    try:
+        f = open("ports.txt", "w")
+        f.write("0.0.0.0 {}".format(starting_port))
+        f.close()
+    except:
+        print("could write to disk")
+        exit()
 
 
     set_start_method('spawn')
@@ -271,8 +275,7 @@ if __name__ == "__main__":
     gnet.share_memory()
     opt = SharedAdam(gnet.parameters(), lr=learning_rate)      # global optimizer
     global_ep, global_ep_r, res_queue = (mp.Value('i', 0), mp.Value('d', 0.), mp.Queue())
-    #worker_amount = mp.cpu_count()
-    worker_amount = 1
+
 
     # parallel training
     workers = [Worker(gnet, opt, global_ep, global_ep_r, res_queue, i) for i in range(worker_amount)]

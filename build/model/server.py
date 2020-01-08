@@ -1,15 +1,21 @@
 import numpy as np
-from pro import process
+
 import cv2
 import time
 
-from __init__ import do_preprocess, greyscale
+from __init__ import greyscale, speed
 
 
 _connected = False
 
 
-def get_image_from_buffer(port, frame):
+def get_image_from_buffer(port):
+    """
+    This function will tell Torcs that it is ready to recieve an image, read said image and format it in the apropriate
+    manner that the model expects.
+    :param port: The ID of this this worker. (used to be the port for network communication but is now the ID for the worker, consider refractoring)
+    :return: returns the image in full, the reward and the collision status.
+    """
     com_file = "/tmp/is{}ready".format(port)
     fifo_pipe = '/tmp/{}.fifo'.format(port)
 
@@ -21,7 +27,7 @@ def get_image_from_buffer(port, frame):
         f.write("2")
     f.close()
 
-    # check if fifo file exists
+    # wait for the fifo file to exist, then read it
     read = False
     while not read:
         try:
@@ -34,10 +40,10 @@ def get_image_from_buffer(port, frame):
             read = False
 
 
-    # convert the binaries to a numpy array
+    # convert the binaries to a numpy array as integers
     nparr = np.frombuffer(message, np.uint8)
 
-    # set the height width and colorspace to 0 to iterate from
+    # set the encoded variables to 0 to iterate from
     height = 0
     width = 0
     colorspace = 0
@@ -70,16 +76,8 @@ def get_image_from_buffer(port, frame):
     for i in range(collision_bits):
         collision += nparr[height_bits + width_bits + colorspace_bits + reward_bits + startbits + i]
 
-
-
-    # remove the hwc encoding and the \0 from the array
-
+    # remove the encoded start bytes and the \0 end bytes from the array
     nparr = np.copy(nparr[height_bits + width_bits + colorspace_bits + reward_bits + collision_bits + startbits:-1])
-
-    # reward = nparr[0]
-    # collision = bool(nparr[1])
-    # nparr[0] = 0
-    # nparr[1] = 0
 
     # reshape the image to the appropriate size
     if colorspace == 1:
@@ -87,28 +85,26 @@ def get_image_from_buffer(port, frame):
     else:
         img = np.reshape(nparr, (height, width, colorspace)).astype(np.float32) / 255
 
-    # rotate and flip the image as it is stored upside down and flipped
-    # img = cv2.rotate(img, cv2.ROTATE_180)
-    # img = cv2.flip(img, 1)
-
-    t1 = time.time()
-
-    if do_preprocess:
-        img = process(img)
-
+    # if the image arrives as grayscale convert to rgb as the model expects rgb.
     if colorspace == 1:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-
-    t2 = time.time()
-
-    # print("time = {}s, do_preprocess = {}, colorspace = {}".format(t2 - t1, do_preprocess, colorspace))
 
     return img, reward, collision
 
 
 
-def drive_car(action, reset, PORT, _break=0, gear=1, clutch=0):
-    f = open("instructions/{}.ini".format(PORT), "w")
+def drive_car(action, reset, ID, _break=0, gear=1, clutch=0):
+    """
+    Drives the car.
+    :param action: steering information
+    :param reset: whether or not to restart the game
+    :param ID: the worker ID
+    :param _break: breaking value
+    :param gear: gear value
+    :param clutch: clutch value
+    :return:
+    """
+    f = open("instructions/{}.ini".format(ID), "w")
     f.write("[steer]\n"
             "accel={}\n"
             "steer={}\n"
@@ -120,21 +116,13 @@ def drive_car(action, reset, PORT, _break=0, gear=1, clutch=0):
     f.close()
 
 
-def step(action, PORT, frame):
-    img, reward, collision = get_image_from_buffer(PORT, frame)
-    drive_car(action, 0, PORT)
+def step(action, reset, PORT):
+    """
+
+    :param action:
+    :param PORT:
+    :return:
+    """
+    drive_car(action, reset, PORT)
+    img, reward, collision = get_image_from_buffer(PORT)
     return (img, reward, collision)
-
-
-
-def reset(PORT, frame):
-    drive_car(0, 1, PORT)
-
-    img, reward, collision = get_image_from_buffer(PORT, frame)
-    return (img)
-
-
-def normallize(x, min, max):
-    return (x - min) / (max - min)
-
-speed = 0.05

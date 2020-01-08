@@ -54,10 +54,6 @@ def push_and_pull(opt, lnet, gnet, done, s_, bs, ba, br, gamma):
     lnet.load_state_dict(gnet.state_dict())
 
 
-
-from __init__ import UTIL_LR
-
-
 def record(global_ep, global_ep_r, ep_r, res_queue, name):
     with global_ep.get_lock():
         global_ep.value += 1
@@ -65,8 +61,8 @@ def record(global_ep, global_ep_r, ep_r, res_queue, name):
         if global_ep_r.value == 0.:
             global_ep_r.value = ep_r
         else:
-            # global_ep_r.value = global_ep_r.value * (1 - UTIL_LR) + ep_r * UTIL_LR
-            global_ep_r.value = ep_r
+            global_ep_r.value = global_ep_r.value * 0.99 + ep_r * 0.01
+            # global_ep_r.value = ep_r
     res_queue.put(global_ep_r.value)
     print(
         name,
