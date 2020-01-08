@@ -756,9 +756,10 @@ ReUpdate(void)
 
 		//here the exporter is created and the collision and reward variables are stored locally.
     Exporter exporter = Exporter(vw, vh);
-		int col = int(s->cars[0]->_collision);
+		int col = int(s->cars[0]->_dammage) - 1124;
 		int rew = int(s->cars[0]->_reward);
 		bool do_resize = s->cars[0]->_do_resize;
+		bool do_preprocess = s->cars[0]->_do_preprocess;
 
 		int height;
 		int width;
@@ -820,8 +821,14 @@ ReUpdate(void)
 		strcpy(ip, r.c_str());
 
 		img = exporter.flip_and_mirror(height, width, 3, img);
+		if (do_preprocess){
+			img = exporter.pre_process(height, width, 3, img);
+		}
+
 
 		exporter.write_to_fifo(img, port, rew, col, height, width);
+
+
 
     exporter.~Exporter();
     ReInfo->_count = 0;

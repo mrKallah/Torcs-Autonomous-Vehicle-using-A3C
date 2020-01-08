@@ -17,6 +17,8 @@ public:
 
 	unsigned char* flip_and_mirror(int height, int width, int colorspace, unsigned char* img);
 
+	unsigned char* pre_process(int height, int width, int colorspace, unsigned char* img);
+
 	void save_img(unsigned char* img);
 
 	std::string int_to_chars(int size, int &bit_count);

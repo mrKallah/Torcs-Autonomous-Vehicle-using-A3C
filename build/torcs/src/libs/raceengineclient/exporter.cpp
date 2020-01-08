@@ -67,7 +67,7 @@ unsigned char* Exporter::resize(int& col, int& rew, unsigned char* img) {
 
 unsigned char* Exporter::flip_and_mirror(int height, int width, int colorspace, unsigned char* img) {
 	// alocate the memory space for the image
-	unsigned char* img_resize = (unsigned char*)malloc(width * height * 3);
+	unsigned char* img_resize = (unsigned char*)malloc(width * height * colorspace);
 
 	int j = 0;
 	for (int h = 0; h < height; h++){
@@ -85,6 +85,50 @@ unsigned char* Exporter::flip_and_mirror(int height, int width, int colorspace, 
 		}
 	}
 
+	free(img);
+
+	return img_resize;
+}
+
+unsigned char* Exporter::pre_process(int height, int width, int colorspace, unsigned char* img) {
+	// alocate the memory space for the image
+
+	unsigned char* img_resize = (unsigned char*)malloc(width * height * colorspace);
+
+	int threshold = 50;
+	int i = 0;
+	for (int w = 0; w < width; w++){
+		bool found = false;
+		for (int h = 0; h < height; h++){
+			int r = 0;
+			int g = 0;
+			int b = 0;
+				for (int c = 0; c < colorspace; c++){
+					int index = (height * width * colorspace) - ((h * colorspace * width) + w * colorspace) + c - 3;
+
+					if (c == 0){
+						r = *(img + index);
+					}
+					if (c == 1){
+						g = *(img + index);
+					}
+					if (c == 2){
+						b = *(img + index);
+						if ((r < threshold && g < threshold && b < threshold) || found) {
+							*(img_resize + index - 0) = 255;
+							*(img_resize + index - 1) = 255;
+							*(img_resize + index - 2) = 255;
+							found = true;
+						} else {
+							*(img_resize + index - 0) = *(img + index - 0);
+							*(img_resize + index - 1) = *(img + index - 1);
+							*(img_resize + index - 2) = *(img + index - 2);
+						}
+					}
+					i++;
+				}
+		}
+	}
 	free(img);
 
 	return img_resize;
@@ -119,9 +163,6 @@ string Exporter::int_to_chars(int size, int &bit_count){
 
 void Exporter::write_to_fifo(unsigned char* img, int port, int reward, int collision, int height, int width){
 		// for some reason collision starts out being 3, so it gets encoded to 0.
-		if (collision == 3) {
-			 collision = 0;
-		}
 
 	string line;
 	string com_file = "/tmp/is" + to_string(port) + "ready";
