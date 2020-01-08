@@ -316,9 +316,10 @@ typedef struct {
     int		dammage;
     int		debug;
 	tCollisionState collision_state; /**< collision state */
-	float 	reward;
-  int current_speed;
-  bool do_resize;
+	float 	reward; // used for ce903
+  int current_speed; // used for ce903
+  bool do_resize; // used for ce903
+  bool do_preprocess; // used for ce903
 
 } tPrivCar;
 /* structure access */
@@ -346,6 +347,10 @@ typedef struct {
 #define _reward		priv.reward // used for ce903
 #define _do_resize priv.do_resize // used for ce903
 #define _current_speed priv.current_speed // used for ce903
+#define _do_preprocess priv.do_preprocess // used for ce903
+#define _collision_state priv.collision_state // used for ce903
+#define _dammage priv.dammage // used for ce903
+
 
 
 /** Info returned by driver during the race */
