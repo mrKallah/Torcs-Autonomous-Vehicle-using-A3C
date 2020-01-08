@@ -101,22 +101,27 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 */
 static void newrace(int index, tCarElt* car, tSituation *s) {
   crashed = false;
-  car->_collision = 0;
   string s_do_resize = "";
+  string s_do_preprocess = "";
   bool do_resize;
+  bool do_preprocess;
   string inifile (HOME + path + "/torcs.ini");
 	// find_var(filename, category, value name, variable to assign value to)
 	find_var(inifile, "torcs", "reward_type", reward_type);
   find_var(inifile, "torcs", "do_resize", s_do_resize);
+  find_var(inifile, "general", "do_preprocess", s_do_preprocess);
 
   do_resize = s_do_resize == "true" || s_do_resize == "True";
+  do_preprocess = s_do_preprocess == "true" || s_do_resize == "True";
 
   car->_do_resize = do_resize;
+  car->_do_preprocess = do_preprocess;
 
 	cout << "###############################################" << endl;
 	cout << "##### Startinga new race with parameters: " << endl;
 	cout << "# Reward type = " << reward_type << endl;
   cout << "# Do resize = " << do_resize << endl;
+  cout << "# Do pre-process = " << do_preprocess << endl;
 	cout << "###############################################" << endl;
 
 }
@@ -231,18 +236,17 @@ static void drive(int index, tCarElt* car, tSituation *s) {
   car->_brakeCmd = brake;
   car->_gearCmd = gear;
 
-  if (car->_collision == 3){
-    car->_collision = 0;
+  if (car->_dammage == 1124){
+    car->_dammage = 0;
   }
 
-  if (car->_collision > 0 || crashed == true){
-    cout << "crashed = " << crashed << ", car->_collision = " << car->_collision << endl;
-    car->_collision = 1;
+  if (car->_dammage > 0 || crashed == true){
+    car->_dammage = 1;
   	crashed = true;
   }
 
   //here the status of the vehicle and program is printed.
-  cout	<< "collision = " << car->_collision
+  cout	<< "collision = " << car->_dammage
   	<< "\n" << "Reward = " << car->_reward
   	<< "\n" << "Restart = " << car->_askRestart
   	<< "\n" << "Steer = " << car->_steerCmd
