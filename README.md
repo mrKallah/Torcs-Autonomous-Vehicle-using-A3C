@@ -1,7 +1,7 @@
 # Torcs Autonomous Vehicle using A3C
 AI controller for autonomous cars
 
-[![Torcs A3C Demonstration Video](https://img.youtube.com/vi/p0b_gyu-4Js/maxresdefault.jpg)](https://youtu.be/p0b_gyu-4Js "Torcs A3C Demonstration Video")
+[![Torcs A3C Demonstration Video](https://img.youtube.com/vi/UEo95sjXGF0/maxresdefault.jpg)](https://youtu.be/UEo95sjXGF0 "Torcs A3C Demonstration Video")
 
 The image above is a link to a video that show the latest example of the development. 
 
